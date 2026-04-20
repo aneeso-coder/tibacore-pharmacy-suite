@@ -38,6 +38,11 @@ const SECTIONS: Section[] = [
     { key: "valuation", label: "Stock Valuation", perm: "see_prices" },
     { key: "stock-total", label: "Total Stock Value", perm: "see_prices" },
     { key: "spend", label: "Supplier Spend", perm: "see_prices" },
+    { key: "pl", label: "P&L Report", perm: "see_prices" },
+    { key: "financial-summary", label: "Financial Summary", perm: "see_prices" },
+  ]},
+  { label: "Insurance", tabs: [
+    { key: "insurance-claims", label: "Insurance Claims", perm: "see_prices" },
   ]},
   { label: "Compliance", tabs: [
     { key: "tra", label: "TRA Summary", perm: "tra_settings" },
