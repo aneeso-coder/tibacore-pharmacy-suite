@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { fmtDateTime, fmtTZS } from "@/lib/format";
 import { sales } from "@/data/seed";
 import { toast } from "sonner";
-import { ShieldCheck, RefreshCw } from "lucide-react";
+import { ShieldCheck, RefreshCw, AlertTriangle } from "lucide-react";
 
 export default function TraSettings() {
   const queue = sales.slice(0, 20);
@@ -51,6 +51,10 @@ export default function TraSettings() {
           <div className="space-y-2 text-sm">
             <Row k="Token expires in" v="58 minutes" />
             <Row k="Global Counter (GC)" v="000054271" />
+            <div className="flex items-center gap-1.5 text-xs text-warning">
+              <AlertTriangle className="h-3 w-3" />
+              <span>This counter must never be reset. Each receipt issued increments this permanently.</span>
+            </div>
             <Row k="Daily Counter (DC)" v="00038" />
             <Row k="Last ZNUM" v="ZN-20250419-001" />
           </div>
@@ -96,7 +100,12 @@ export default function TraSettings() {
       </Card>
 
       <Card className="p-5">
-        <h3 className="font-medium mb-3">Z Report Log — Last 7 days</h3>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-medium">Z Report Log — Last 7 days</h3>
+          <Button onClick={() => toast.success("Z Report submitted to TRA (demo)")}>
+            Submit Today's Z Report
+          </Button>
+        </div>
         <Table>
           <TableHeader>
             <TableRow>
@@ -110,12 +119,14 @@ export default function TraSettings() {
           <TableBody>
             {Array.from({ length: 7 }).map((_, i) => {
               const d = new Date(); d.setDate(d.getDate() - i);
+              const dow = d.getDay();
+              const isWeekend = dow === 0 || dow === 6;
               const status = i === 0 ? "PENDING" : i === 3 ? "FAILED" : "SUBMITTED";
               return (
                 <TableRow key={i}>
                   <TableCell className="num text-xs">{d.toLocaleDateString()}</TableCell>
                   <TableCell className="num font-medium">ZN-{d.toISOString().slice(0,10).replace(/-/g,"")}-001</TableCell>
-                  <TableCell className="text-right num">{fmtTZS(800000 + i * 50000)}</TableCell>
+                  <TableCell className="text-right num">{fmtTZS((isWeekend ? 350000 : 800000) + i * 50000)}</TableCell>
                   <TableCell className="num text-xs">{i === 0 ? "—" : `${d.toLocaleDateString()} 23:55`}</TableCell>
                   <TableCell><TraBadge status={status as any} /></TableCell>
                 </TableRow>

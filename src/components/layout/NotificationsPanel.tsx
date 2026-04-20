@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { AlertTriangle, PackageX, FileX2, Clock } from "lucide-react";
 import { useApp } from "@/context/AppContext";
 
-export function NotificationsPanel({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function NotificationsPanel({ open, onClose, onMarkAllRead }: { open: boolean; onClose: () => void; onMarkAllRead?: () => void }) {
   const { branch } = useApp();
   const lowStock = products.filter((p) => {
     const qty = branch.id === "br_main" ? p.stockMain : p.stockUpanga;
@@ -61,8 +61,8 @@ export function NotificationsPanel({ open, onClose }: { open: boolean; onClose: 
           )}
         </div>
         <div className="border-t p-3 flex items-center justify-between gap-2">
-          <Button variant="ghost" size="sm">Mark all read</Button>
-          <Button variant="ghost" size="sm" className="text-muted-foreground">Clear all</Button>
+          <Button variant="ghost" size="sm" onClick={() => { onMarkAllRead?.(); onClose(); }}>Mark all read</Button>
+          <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={() => { onMarkAllRead?.(); onClose(); }}>Clear all</Button>
         </div>
       </SheetContent>
     </Sheet>

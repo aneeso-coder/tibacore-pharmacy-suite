@@ -7,15 +7,31 @@ import {
   DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { NotificationsPanel } from "./NotificationsPanel";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
+import { products, batches, sales } from "@/data/seed";
 
 export function Topbar({ title }: { title?: string }) {
-  const { user, logout } = useApp();
+  const { user, logout, branch } = useApp();
   const { theme, toggle } = useTheme();
   const [openNotif, setOpenNotif] = useState(false);
+  const [read, setRead] = useState(false);
   const nav = useNavigate();
+
+  const notifCount = useMemo(() => {
+    const lowStock = products.filter((p) => {
+      const qty = branch.id === "br_main" ? p.stockMain : p.stockUpanga;
+      return qty <= p.reorderPoint;
+    }).length;
+    const expiring = batches.filter((b) => {
+      const days = Math.floor((+new Date(b.expiryDate) - Date.now()) / 86400000);
+      return days <= 90 && days >= 0;
+    }).length;
+    const failed = sales.filter((s) => s.traStatus === "FAILED").length;
+    const zReport = new Date().getHours() >= 18 ? 1 : 0;
+    return lowStock + expiring + failed + zReport;
+  }, [branch.id]);
 
   return (
     <header className="sticky top-0 z-30 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -29,9 +45,13 @@ export function Topbar({ title }: { title?: string }) {
           <Button variant="ghost" size="icon" onClick={toggle} aria-label="Toggle theme">
             {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
-          <Button variant="ghost" size="icon" className="relative" onClick={() => setOpenNotif(true)}>
+          <Button variant="ghost" size="icon" className="relative" onClick={() => { setOpenNotif(true); }}>
             <Bell className="h-4 w-4" />
-            <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-destructive" />
+            {!read && notifCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 h-4 min-w-4 px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-semibold flex items-center justify-center num">
+                {notifCount > 99 ? "99+" : notifCount}
+              </span>
+            )}
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -55,7 +75,7 @@ export function Topbar({ title }: { title?: string }) {
           </DropdownMenu>
         </div>
       </div>
-      <NotificationsPanel open={openNotif} onClose={() => setOpenNotif(false)} />
+      <NotificationsPanel open={openNotif} onClose={() => setOpenNotif(false)} onMarkAllRead={() => setRead(true)} />
     </header>
   );
 }
