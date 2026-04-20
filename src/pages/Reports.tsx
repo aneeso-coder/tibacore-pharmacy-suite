@@ -18,22 +18,41 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
-const tabs = [
-  { key: "sales", label: "Monthly Sales" },
-  { key: "daily", label: "Daily Sales" },
-  { key: "weekly", label: "Weekly Sales" },
-  { key: "top", label: "Top Selling" },
-  { key: "margin", label: "Best Margin" },
-  { key: "slow", label: "Slow Moving" },
-  { key: "stock-total", label: "Total Stock Value" },
-  { key: "stock-item", label: "Stock Per Item" },
-  { key: "valuation", label: "Stock Valuation" },
-  { key: "expiry", label: "Expiry Report" },
-  { key: "spend", label: "Supplier Spend" },
-  { key: "debtors", label: "Debtor Aging" },
-  { key: "tra", label: "TRA Summary" },
-  { key: "custom", label: "Custom Report" },
+type Tab = { key: string; label: string; perm?: "see_prices" | "tra_settings" };
+type Section = { label: string; tabs: Tab[] };
+
+const SECTIONS: Section[] = [
+  { label: "Sales", tabs: [
+    { key: "sales", label: "Sales Overview" },
+    { key: "daily", label: "Sales by Day" },
+    { key: "weekly", label: "Sales by Week" },
+    { key: "top", label: "Top Products" },
+  ]},
+  { label: "Inventory", tabs: [
+    { key: "slow", label: "Slow Movers" },
+    { key: "stock-item", label: "Stock per Item" },
+    { key: "expiry", label: "Expiry Report" },
+  ]},
+  { label: "Financial", tabs: [
+    { key: "margin", label: "Margin Analysis", perm: "see_prices" },
+    { key: "valuation", label: "Stock Valuation", perm: "see_prices" },
+    { key: "stock-total", label: "Total Stock Value", perm: "see_prices" },
+    { key: "spend", label: "Supplier Spend", perm: "see_prices" },
+  ]},
+  { label: "Compliance", tabs: [
+    { key: "tra", label: "TRA Summary", perm: "tra_settings" },
+    { key: "debtors", label: "Debtor Aging", perm: "tra_settings" },
+  ]},
+  { label: "Custom", tabs: [
+    { key: "custom", label: "Custom Builder" },
+  ]},
 ];
+
+const PERIOD_LABELS: Record<string, string> = {
+  today: "Today", yesterday: "Yesterday", this_week: "This Week", last_week: "Last Week",
+  this_month: "This Month", last_month: "Last Month", this_quarter: "This Quarter",
+  this_year: "This Year", last_year: "Last Year", mtm: "MTM", yty: "YTY", custom: "Custom Range",
+};
 
 type PeriodKey =
   | "today" | "yesterday" | "this_week" | "last_week"
