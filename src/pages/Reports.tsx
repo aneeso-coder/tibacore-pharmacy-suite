@@ -107,6 +107,7 @@ function computeRange(period: PeriodKey): { from: Date; to: Date } {
 export default function Reports() {
   const { kind = "sales" } = useParams();
   const nav = useNavigate();
+  const { can, showBuyPrices } = useApp();
   const [period, setPeriod] = useState<PeriodKey>("this_month");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
@@ -120,29 +121,63 @@ export default function Reports() {
     return computeRange(period);
   }, [period, dateFrom, dateTo]);
 
+  // Role-aware section/tab filtering — hide entirely, never disable
+  const visibleSections = useMemo(() => {
+    return SECTIONS.map((sec) => ({
+      ...sec,
+      tabs: sec.tabs.filter((t) => {
+        if (t.perm === "see_prices" && !showBuyPrices) return false;
+        if (t.perm === "tra_settings" && !can("tra_settings")) return false;
+        return true;
+      }),
+    })).filter((sec) => sec.tabs.length > 0);
+  }, [can, showBuyPrices]);
+
+  // Find active tab label for the period-aware page title
+  const activeTab = useMemo(() => {
+    for (const sec of visibleSections) {
+      const t = sec.tabs.find((x) => x.key === kind);
+      if (t) return t;
+    }
+    return visibleSections[0]?.tabs[0];
+  }, [visibleSections, kind]);
+
+  const periodSuffix = PERIOD_LABELS[period] ?? "";
+  const titleWithPeriod = activeTab ? `${activeTab.label} — ${periodSuffix}` : "Reports";
+
   return (
     <AppLayout title="Reports">
-      <PageHeader title="Reports" description="Operational, financial and compliance reports" />
-      <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr] gap-4">
-        <Card className="p-2 h-fit">
-          <nav className="flex flex-col gap-0.5">
-            {tabs.map((t) => (
-              <button
-                key={t.key}
-                onClick={() => nav(`/reports/${t.key}`)}
-                className={cn(
-                  "text-left text-sm px-3 py-2 rounded-md hover:bg-muted transition",
-                  kind === t.key && "bg-accent text-accent-foreground font-medium"
-                )}
-              >
-                {t.label}
-              </button>
+      <PageHeader title={titleWithPeriod} description={`${fmtDate(range.from)} — ${fmtDate(range.to)}`} />
+      <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-4">
+        <Card className="p-2 h-fit max-h-[calc(100vh-180px)] overflow-y-auto">
+          <nav className="flex flex-col gap-2">
+            {visibleSections.map((sec) => (
+              <div key={sec.label}>
+                <div className="px-2 mb-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  {sec.label}
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  {sec.tabs.map((t) => (
+                    <button
+                      key={t.key}
+                      onClick={() => nav(`/reports/${t.key}`)}
+                      className={cn(
+                        "text-left text-sm px-3 py-1.5 rounded-md hover:bg-muted transition",
+                        kind === t.key && "bg-accent text-accent-foreground font-medium"
+                      )}
+                    >
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             ))}
           </nav>
         </Card>
         <div>
-          <Card className="p-3 mb-4">
+          <Card className="p-3 mb-4 sticky top-14 z-20 bg-card">
             <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Period:</span>
               <Select value={period} onValueChange={(v) => setPeriod(v as PeriodKey)}>
                 <SelectTrigger className="w-56"><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -155,8 +190,6 @@ export default function Reports() {
                   <SelectItem value="this_quarter">This Quarter</SelectItem>
                   <SelectItem value="this_year">This Year</SelectItem>
                   <SelectItem value="last_year">Last Year</SelectItem>
-                  <SelectItem value="mtm">Month vs Previous Month</SelectItem>
-                  <SelectItem value="yty">Year vs Previous Year</SelectItem>
                   <SelectItem value="custom">Custom Range</SelectItem>
                 </SelectContent>
               </Select>
@@ -167,7 +200,7 @@ export default function Reports() {
                   <Input type="date" className="w-44" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
                 </>
               ) : (
-                <span className="text-xs text-muted-foreground">{fmtDate(range.from)} — {fmtDate(range.to)}</span>
+                <span className="text-xs text-muted-foreground num">{fmtDate(range.from)} — {fmtDate(range.to)}</span>
               )}
               <div className="ml-auto flex gap-2">
                 <Button variant="outline" size="sm" onClick={() => toast.success("Excel exported (demo)")}>
