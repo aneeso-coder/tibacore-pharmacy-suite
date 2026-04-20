@@ -34,6 +34,7 @@ export default function SystemSettings() {
           <TabsTrigger value="operations">Operations</TabsTrigger>
           <TabsTrigger value="branches">Branches</TabsTrigger>
           <TabsTrigger value="backup">Backup</TabsTrigger>
+          <TabsTrigger value="expenses">Expenses</TabsTrigger>
         </TabsList>
 
         <TabsContent value="general">
