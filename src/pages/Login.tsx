@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -19,13 +19,13 @@ const demos = [
 export default function Login() {
   const { login, user } = useApp();
   const nav = useNavigate();
-  const [email, setEmail] = useState("admin@tibacore.com");
+  const [email, setEmail] = useState("emmanuel.solomon@tibacore.com");
   const [password, setPassword] = useState("admin123");
   const [loading, setLoading] = useState(false);
 
-  if (user) {
-    nav("/", { replace: true });
-  }
+  useEffect(() => {
+    if (user) nav("/", { replace: true });
+  }, [user, nav]);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();

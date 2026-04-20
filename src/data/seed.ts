@@ -45,7 +45,7 @@ export const users: User[] = [
   {
     id: "u1",
     name: "Emmanuel Solomon",
-    email: "admin@tibacore.com",
+    email: "emmanuel.solomon@tibacore.com",
     role: "super_admin",
     branchId: "ALL",
     active: true,
@@ -81,7 +81,7 @@ export const users: User[] = [
 ];
 
 export const credentials: Record<string, string> = {
-  "admin@tibacore.com": "admin123",
+  "emmanuel.solomon@tibacore.com": "admin123",
   "pharmacist@tibacore.com": "pharma123",
   "cashier@tibacore.com": "cash123",
   "viewer@tibacore.com": "view123",
