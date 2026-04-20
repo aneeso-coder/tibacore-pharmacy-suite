@@ -250,3 +250,133 @@ function MiniSelect({ defaultValue, options, wide }: { defaultValue: string; opt
     </Select>
   );
 }
+
+function ExpensesTab() {
+  const { user, branch, branches } = useApp();
+  const isAdmin = user?.role === "super_admin";
+  const [list, setList] = useState<Expense[]>(seedExpenses);
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState({
+    date: new Date().toISOString().slice(0, 10),
+    category: "Salaries" as Expense["category"],
+    description: "",
+    amount: "",
+    branchId: branch.id,
+  });
+
+  const visible = useMemo(() => {
+    return list.filter((e) => isAdmin || e.branchId === branch.id)
+      .sort((a, b) => +new Date(b.date) - +new Date(a.date));
+  }, [list, isAdmin, branch.id]);
+
+  const monthStart = new Date();
+  monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
+  const monthTotal = visible.filter((e) => new Date(e.date) >= monthStart).reduce((a, e) => a + e.amount, 0);
+
+  const canSave = form.description.trim() && Number(form.amount) > 0 && form.date && form.branchId;
+
+  const save = () => {
+    if (!canSave || !user) return;
+    const rec: Expense = {
+      id: `ex_${Date.now()}`,
+      date: new Date(form.date).toISOString(),
+      category: form.category,
+      description: form.description.trim(),
+      amount: Number(form.amount),
+      branchId: form.branchId,
+      recordedBy: user.id,
+    };
+    setList((prev) => [rec, ...prev]);
+    setOpen(false);
+    toast.success("Expense recorded");
+    setForm({ date: new Date().toISOString().slice(0, 10), category: "Salaries", description: "", amount: "", branchId: branch.id });
+  };
+
+  return (
+    <>
+      <Card className="overflow-hidden">
+        <div className="p-3 flex items-center justify-between border-b">
+          <div className="text-sm text-muted-foreground">{visible.length} expense{visible.length === 1 ? "" : "s"}</div>
+          <Button size="sm" onClick={() => setOpen(true)}><Plus className="h-4 w-4 mr-1.5" /> Add Expense</Button>
+        </div>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Date</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead>Description</TableHead>
+              <TableHead className="text-right">Amount</TableHead>
+              <TableHead>Branch</TableHead>
+              <TableHead>Recorded By</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {visible.length === 0 ? (
+              <TableRow><TableCell colSpan={6} className="text-center text-sm text-muted-foreground py-8">No expenses recorded.</TableCell></TableRow>
+            ) : visible.map((e) => {
+              const br = branches.find((b) => b.id === e.branchId);
+              const u = seedUsers.find((x) => x.id === e.recordedBy);
+              return (
+                <TableRow key={e.id}>
+                  <TableCell className="num text-xs">{fmtDate(e.date)}</TableCell>
+                  <TableCell><span className="text-xs px-2 py-0.5 rounded-md bg-muted">{e.category}</span></TableCell>
+                  <TableCell>{e.description}</TableCell>
+                  <TableCell className="text-right num font-medium">{fmtTZS(e.amount)}</TableCell>
+                  <TableCell className="text-xs">{br?.name ?? "—"}</TableCell>
+                  <TableCell className="text-xs">{u?.name ?? "—"}</TableCell>
+                </TableRow>
+              );
+            })}
+            <TableRow className="bg-primary/5 border-t-2">
+              <TableCell colSpan={3} className="font-semibold">Total this month</TableCell>
+              <TableCell className="text-right num font-bold">{fmtTZS(monthTotal)}</TableCell>
+              <TableCell colSpan={2} />
+            </TableRow>
+          </TableBody>
+        </Table>
+      </Card>
+
+      <Sheet open={open} onOpenChange={(o) => !o && setOpen(false)}>
+        <SheetContent className="sm:max-w-md">
+          <SheetHeader><SheetTitle>Add Expense</SheetTitle></SheetHeader>
+          <div className="space-y-3 mt-5">
+            <div className="space-y-1.5">
+              <Label className="text-sm">Date *</Label>
+              <Input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-sm">Category *</Label>
+              <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v as Expense["category"] })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {EXPENSE_CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-sm">Description *</Label>
+              <Input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="What is this expense for?" />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-sm">Amount (TZS) *</Label>
+              <Input type="number" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} placeholder="0" />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-sm">Branch *</Label>
+              <Select value={form.branchId} onValueChange={(v) => setForm({ ...form, branchId: v })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {branches.map((b) => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <SheetFooter className="mt-5">
+            <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+            <Button onClick={save} disabled={!canSave}>Add Expense</Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
+    </>
+  );
+}
