@@ -1,6 +1,22 @@
 import type {
-  Branch, User, Product, Supplier, Customer, Batch, Sale, Prescription, PurchaseOrder, AuditEntry, TaxCode, Invoice, SupplierPayable, SaleLine,
-  InsuranceProvider, InsurancePrice, AdjustmentRecord, Expense,
+  Branch,
+  User,
+  Product,
+  Supplier,
+  Customer,
+  Batch,
+  Sale,
+  Prescription,
+  PurchaseOrder,
+  AuditEntry,
+  TaxCode,
+  Invoice,
+  SupplierPayable,
+  SaleLine,
+  InsuranceProvider,
+  InsurancePrice,
+  AdjustmentRecord,
+  Expense,
 } from "./types";
 
 export const ORG = {
@@ -26,10 +42,42 @@ export const branches: Branch[] = [
 ];
 
 export const users: User[] = [
-  { id: "u1", name: "Dr. Amina Hassan", email: "admin@tibacore.com", role: "super_admin", branchId: "ALL", active: true, lastLogin: "2025-04-19T08:30:00" },
-  { id: "u2", name: "John Mwangi", email: "pharmacist@tibacore.com", role: "pharmacist", branchId: "br_main", active: true, lastLogin: "2025-04-19T07:45:00" },
-  { id: "u3", name: "Grace Kimaro", email: "cashier@tibacore.com", role: "cashier", branchId: "br_main", active: true, lastLogin: "2025-04-19T08:00:00" },
-  { id: "u4", name: "Peter Mollel", email: "viewer@tibacore.com", role: "viewer", branchId: "br_upanga", active: true, lastLogin: "2025-04-18T17:20:00" },
+  {
+    id: "u1",
+    name: "Emmanuel Solomon",
+    email: "admin@tibacore.com",
+    role: "super_admin",
+    branchId: "ALL",
+    active: true,
+    lastLogin: "2025-04-19T08:30:00",
+  },
+  {
+    id: "u2",
+    name: "John Mwangi",
+    email: "pharmacist@tibacore.com",
+    role: "pharmacist",
+    branchId: "br_main",
+    active: true,
+    lastLogin: "2025-04-19T07:45:00",
+  },
+  {
+    id: "u3",
+    name: "Grace Kimaro",
+    email: "cashier@tibacore.com",
+    role: "cashier",
+    branchId: "br_main",
+    active: true,
+    lastLogin: "2025-04-19T08:00:00",
+  },
+  {
+    id: "u4",
+    name: "Peter Mollel",
+    email: "viewer@tibacore.com",
+    role: "viewer",
+    branchId: "br_upanga",
+    active: true,
+    lastLogin: "2025-04-18T17:20:00",
+  },
 ];
 
 export const credentials: Record<string, string> = {
@@ -39,10 +87,30 @@ export const credentials: Record<string, string> = {
   "viewer@tibacore.com": "view123",
 };
 
-const mk = (i: number, name: string, cat: string, unit: string, pack: string, sell: number, buy: number, tax: TaxCode, rx: boolean, reorder: number, controlled = false): Product => ({
+const mk = (
+  i: number,
+  name: string,
+  cat: string,
+  unit: string,
+  pack: string,
+  sell: number,
+  buy: number,
+  tax: TaxCode,
+  rx: boolean,
+  reorder: number,
+  controlled = false,
+): Product => ({
   id: `p${i}`,
   barcode: `60100${String(i).padStart(4, "0")}`,
-  name, category: cat, unit, packSize: pack, sellPrice: sell, buyPrice: buy, taxCode: tax, rxRequired: rx, controlled,
+  name,
+  category: cat,
+  unit,
+  packSize: pack,
+  sellPrice: sell,
+  buyPrice: buy,
+  taxCode: tax,
+  rxRequired: rx,
+  controlled,
   reorderPoint: reorder,
   stockMain: Math.max(0, Math.floor(reorder * (1.5 + (i % 4)))),
   stockUpanga: Math.max(0, Math.floor(reorder * (0.6 + (i % 3) * 0.4))),
@@ -72,9 +140,48 @@ export const products: Product[] = [
 ];
 
 export const suppliers: Supplier[] = [
-  { id: "s1", name: "Shelys Pharmaceuticals Ltd", contact: "Mr. Karim", phone: "+255713000111", email: "sales@shelys.co.tz", productIds: ["p2","p3","p4","p9","p15","p16"], tin: "111-222-333", address: "Pugu Road, Dar es Salaam", paymentTerms: "30_days", creditLimit: 5000000, outstandingBalance: 1250000, active: true },
-  { id: "s2", name: "Cosmos Limited", contact: "Ms. Neema", phone: "+255713000222", email: "orders@cosmos.co.tz", productIds: ["p1","p5","p6","p7","p8","p10","p11","p12","p13","p17","p19"], tin: "444-555-666", address: "Kariakoo Market, Dar es Salaam", paymentTerms: "COD", creditLimit: 0, outstandingBalance: 0, active: true },
-  { id: "s3", name: "Dawa Limited", contact: "Mr. Joseph", phone: "+255713000333", email: "info@dawa.co.tz", productIds: ["p14","p15","p18","p20"], tin: "777-888-999", address: "Industrial Area, Dar es Salaam", paymentTerms: "60_days", creditLimit: 8000000, outstandingBalance: 3400000, active: true },
+  {
+    id: "s1",
+    name: "Shelys Pharmaceuticals Ltd",
+    contact: "Mr. Karim",
+    phone: "+255713000111",
+    email: "sales@shelys.co.tz",
+    productIds: ["p2", "p3", "p4", "p9", "p15", "p16"],
+    tin: "111-222-333",
+    address: "Pugu Road, Dar es Salaam",
+    paymentTerms: "30_days",
+    creditLimit: 5000000,
+    outstandingBalance: 1250000,
+    active: true,
+  },
+  {
+    id: "s2",
+    name: "Cosmos Limited",
+    contact: "Ms. Neema",
+    phone: "+255713000222",
+    email: "orders@cosmos.co.tz",
+    productIds: ["p1", "p5", "p6", "p7", "p8", "p10", "p11", "p12", "p13", "p17", "p19"],
+    tin: "444-555-666",
+    address: "Kariakoo Market, Dar es Salaam",
+    paymentTerms: "COD",
+    creditLimit: 0,
+    outstandingBalance: 0,
+    active: true,
+  },
+  {
+    id: "s3",
+    name: "Dawa Limited",
+    contact: "Mr. Joseph",
+    phone: "+255713000333",
+    email: "info@dawa.co.tz",
+    productIds: ["p14", "p15", "p18", "p20"],
+    tin: "777-888-999",
+    address: "Industrial Area, Dar es Salaam",
+    paymentTerms: "60_days",
+    creditLimit: 8000000,
+    outstandingBalance: 3400000,
+    active: true,
+  },
 ];
 
 export const customers: Customer[] = [
@@ -97,23 +204,38 @@ export const batches: Batch[] = products.flatMap((p, idx) => {
   const batches: Batch[] = [];
   const b1Expiry = addDays(today, 20 + idx * 5); // some near expiry
   batches.push({
-    id: `b_${p.id}_1`, productId: p.id, supplierId,
-    batchNo: `BN${idx + 1}001`, receivedDate: addDays(today, -90).toISOString(),
-    expiryDate: b1Expiry.toISOString(), qtyReceived: p.reorderPoint * 3, qtyRemaining: Math.floor(p.reorderPoint * 1.5),
+    id: `b_${p.id}_1`,
+    productId: p.id,
+    supplierId,
+    batchNo: `BN${idx + 1}001`,
+    receivedDate: addDays(today, -90).toISOString(),
+    expiryDate: b1Expiry.toISOString(),
+    qtyReceived: p.reorderPoint * 3,
+    qtyRemaining: Math.floor(p.reorderPoint * 1.5),
     buyPrice: p.buyPrice,
   });
   batches.push({
-    id: `b_${p.id}_2`, productId: p.id, supplierId,
-    batchNo: `BN${idx + 1}002`, receivedDate: addDays(today, -30).toISOString(),
+    id: `b_${p.id}_2`,
+    productId: p.id,
+    supplierId,
+    batchNo: `BN${idx + 1}002`,
+    receivedDate: addDays(today, -30).toISOString(),
     expiryDate: addDays(today, 365 + idx * 10).toISOString(),
-    qtyReceived: p.reorderPoint * 2, qtyRemaining: Math.floor(p.reorderPoint * 1.2),
+    qtyReceived: p.reorderPoint * 2,
+    qtyRemaining: Math.floor(p.reorderPoint * 1.2),
     buyPrice: p.buyPrice,
   });
   return batches;
 });
 
-const computeLineTotals = (lines: { productId: string; qty: number; unitPrice: number; discountPct: number; taxCode: TaxCode; name: string }[]) => {
-  let subtotal = 0, discountTotal = 0, vatA = 0, vatC = 0, vatE = 0;
+const computeLineTotals = (
+  lines: { productId: string; qty: number; unitPrice: number; discountPct: number; taxCode: TaxCode; name: string }[],
+) => {
+  let subtotal = 0,
+    discountTotal = 0,
+    vatA = 0,
+    vatC = 0,
+    vatE = 0;
   const out = lines.map((l) => {
     const gross = l.qty * l.unitPrice;
     const discount = gross * (l.discountPct / 100);
@@ -144,8 +266,12 @@ const seedSales = (): Sale[] => {
       const rawLines = Array.from({ length: lineCount }, (_, k) => {
         const p = products[(day * 3 + i + k) % products.length];
         return {
-          productId: p.id, name: p.name, qty: 1 + ((i + k) % 3),
-          unitPrice: p.sellPrice, discountPct: i % 7 === 0 ? 5 : 0, taxCode: p.taxCode,
+          productId: p.id,
+          name: p.name,
+          qty: 1 + ((i + k) % 3),
+          unitPrice: p.sellPrice,
+          discountPct: i % 7 === 0 ? 5 : 0,
+          taxCode: p.taxCode,
         };
       });
       const t = computeLineTotals(rawLines);
@@ -156,13 +282,18 @@ const seedSales = (): Sale[] => {
         id: `sale_${counter}`,
         receiptNo: `RC-${String(counter).padStart(5, "0")}`,
         date: ts.toISOString(),
-        branchId, cashierId,
+        branchId,
+        cashierId,
         customerId: customer ? customer.id : undefined,
         customerName: customer ? customer.name : "Walk-in",
         lines: t.lines as any,
-        subtotal: t.subtotal, discountTotal: t.discountTotal,
-        vatA: t.vatA, vatC: t.vatC, vatE: t.vatE,
-        total: t.total, payment,
+        subtotal: t.subtotal,
+        discountTotal: t.discountTotal,
+        vatA: t.vatA,
+        vatC: t.vatC,
+        vatE: t.vatE,
+        total: t.total,
+        payment,
         traStatus: i % 17 === 0 ? "FAILED" : i % 11 === 0 ? "PENDING" : "SUBMITTED",
       });
       counter++;
@@ -174,42 +305,152 @@ const seedSales = (): Sale[] => {
 export const sales: Sale[] = seedSales();
 
 export const prescriptions: Prescription[] = [
-  { id: "rx1", rxNo: "RX-0001", patient: "Fatuma Salim", prescriber: "Dr. Mwakasege", date: addDays(today, -2).toISOString(), status: "ACTIVE",
-    lines: [{ productId: "p2", prescribedQty: 2, dispensedQty: 0 }, { productId: "p10", prescribedQty: 1, dispensedQty: 0 }] },
-  { id: "rx2", rxNo: "RX-0002", patient: "Hassan Juma", prescriber: "Dr. Said", date: addDays(today, -5).toISOString(), status: "PARTIAL",
-    lines: [{ productId: "p3", prescribedQty: 3, dispensedQty: 1 }] },
-  { id: "rx3", rxNo: "RX-0003", patient: "Mary Msigwa", prescriber: "Dr. Mhina", date: addDays(today, -10).toISOString(), status: "DISPENSED",
-    lines: [{ productId: "p16", prescribedQty: 1, dispensedQty: 1 }] },
-  { id: "rx4", rxNo: "RX-0004", patient: "Ahmed Rashid", prescriber: "Dr. Mwakasege", date: addDays(today, -40).toISOString(), status: "EXPIRED",
-    lines: [{ productId: "p4", prescribedQty: 2, dispensedQty: 0 }] },
+  {
+    id: "rx1",
+    rxNo: "RX-0001",
+    patient: "Fatuma Salim",
+    prescriber: "Dr. Mwakasege",
+    date: addDays(today, -2).toISOString(),
+    status: "ACTIVE",
+    lines: [
+      { productId: "p2", prescribedQty: 2, dispensedQty: 0 },
+      { productId: "p10", prescribedQty: 1, dispensedQty: 0 },
+    ],
+  },
+  {
+    id: "rx2",
+    rxNo: "RX-0002",
+    patient: "Hassan Juma",
+    prescriber: "Dr. Said",
+    date: addDays(today, -5).toISOString(),
+    status: "PARTIAL",
+    lines: [{ productId: "p3", prescribedQty: 3, dispensedQty: 1 }],
+  },
+  {
+    id: "rx3",
+    rxNo: "RX-0003",
+    patient: "Mary Msigwa",
+    prescriber: "Dr. Mhina",
+    date: addDays(today, -10).toISOString(),
+    status: "DISPENSED",
+    lines: [{ productId: "p16", prescribedQty: 1, dispensedQty: 1 }],
+  },
+  {
+    id: "rx4",
+    rxNo: "RX-0004",
+    patient: "Ahmed Rashid",
+    prescriber: "Dr. Mwakasege",
+    date: addDays(today, -40).toISOString(),
+    status: "EXPIRED",
+    lines: [{ productId: "p4", prescribedQty: 2, dispensedQty: 0 }],
+  },
 ];
 
 export const purchaseOrders: PurchaseOrder[] = [
-  { id: "po1", poNo: "PO-0001", branchId: "br_main", supplierId: "s1", date: addDays(today, -14).toISOString(),
-    expectedDate: addDays(today, -7).toISOString(), status: "RECEIVED",
-    lines: [{ productId: "p2", qty: 50, received: 50, buyPrice: 3800 }, { productId: "p3", qty: 30, received: 30, buyPrice: 5500 }],
-    total: 50 * 3800 + 30 * 5500 },
-  { id: "po2", poNo: "PO-0002", branchId: "br_main", supplierId: "s2", date: addDays(today, -5).toISOString(),
-    expectedDate: addDays(today, 2).toISOString(), status: "PARTIAL",
-    lines: [{ productId: "p1", qty: 100, received: 60, buyPrice: 1200 }, { productId: "p5", qty: 40, received: 40, buyPrice: 1800 }],
-    total: 100 * 1200 + 40 * 1800 },
-  { id: "po3", poNo: "PO-0003", branchId: "br_upanga", supplierId: "s3", date: addDays(today, -1).toISOString(),
-    expectedDate: addDays(today, 5).toISOString(), status: "SENT",
-    lines: [{ productId: "p15", qty: 20, received: 0, buyPrice: 8500 }, { productId: "p18", qty: 10, received: 0, buyPrice: 9500 }],
-    total: 20 * 8500 + 10 * 9500 },
-  { id: "po4", poNo: "PO-0004", branchId: "br_main", supplierId: "s2", date: addDays(today, 0).toISOString(),
-    expectedDate: addDays(today, 7).toISOString(), status: "DRAFT",
+  {
+    id: "po1",
+    poNo: "PO-0001",
+    branchId: "br_main",
+    supplierId: "s1",
+    date: addDays(today, -14).toISOString(),
+    expectedDate: addDays(today, -7).toISOString(),
+    status: "RECEIVED",
+    lines: [
+      { productId: "p2", qty: 50, received: 50, buyPrice: 3800 },
+      { productId: "p3", qty: 30, received: 30, buyPrice: 5500 },
+    ],
+    total: 50 * 3800 + 30 * 5500,
+  },
+  {
+    id: "po2",
+    poNo: "PO-0002",
+    branchId: "br_main",
+    supplierId: "s2",
+    date: addDays(today, -5).toISOString(),
+    expectedDate: addDays(today, 2).toISOString(),
+    status: "PARTIAL",
+    lines: [
+      { productId: "p1", qty: 100, received: 60, buyPrice: 1200 },
+      { productId: "p5", qty: 40, received: 40, buyPrice: 1800 },
+    ],
+    total: 100 * 1200 + 40 * 1800,
+  },
+  {
+    id: "po3",
+    poNo: "PO-0003",
+    branchId: "br_upanga",
+    supplierId: "s3",
+    date: addDays(today, -1).toISOString(),
+    expectedDate: addDays(today, 5).toISOString(),
+    status: "SENT",
+    lines: [
+      { productId: "p15", qty: 20, received: 0, buyPrice: 8500 },
+      { productId: "p18", qty: 10, received: 0, buyPrice: 9500 },
+    ],
+    total: 20 * 8500 + 10 * 9500,
+  },
+  {
+    id: "po4",
+    poNo: "PO-0004",
+    branchId: "br_main",
+    supplierId: "s2",
+    date: addDays(today, 0).toISOString(),
+    expectedDate: addDays(today, 7).toISOString(),
+    status: "DRAFT",
     lines: [{ productId: "p7", qty: 80, received: 0, buyPrice: 600 }],
-    total: 80 * 600 },
+    total: 80 * 600,
+  },
 ];
 
 export const auditLog: AuditEntry[] = [
-  { id: "a1", ts: addDays(today, 0).toISOString(), userId: "u1", action: "LOGIN", module: "Auth", description: "Signed in" },
-  { id: "a2", ts: addDays(today, 0).toISOString(), userId: "u2", action: "CREATE", module: "Sales", description: "Created sale RC-00541" },
-  { id: "a3", ts: addDays(today, -1).toISOString(), userId: "u1", action: "UPDATE", module: "Products", description: "Updated price for Panadol Extra" },
-  { id: "a4", ts: addDays(today, -1).toISOString(), userId: "u3", action: "CREATE", module: "Sales", description: "Created sale RC-00538" },
-  { id: "a5", ts: addDays(today, -2).toISOString(), userId: "u1", action: "CREATE", module: "Users", description: "Added user Peter Mollel" },
-  { id: "a6", ts: addDays(today, -3).toISOString(), userId: "u2", action: "UPDATE", module: "Inventory", description: "Adjusted stock for Coartem" },
+  {
+    id: "a1",
+    ts: addDays(today, 0).toISOString(),
+    userId: "u1",
+    action: "LOGIN",
+    module: "Auth",
+    description: "Signed in",
+  },
+  {
+    id: "a2",
+    ts: addDays(today, 0).toISOString(),
+    userId: "u2",
+    action: "CREATE",
+    module: "Sales",
+    description: "Created sale RC-00541",
+  },
+  {
+    id: "a3",
+    ts: addDays(today, -1).toISOString(),
+    userId: "u1",
+    action: "UPDATE",
+    module: "Products",
+    description: "Updated price for Panadol Extra",
+  },
+  {
+    id: "a4",
+    ts: addDays(today, -1).toISOString(),
+    userId: "u3",
+    action: "CREATE",
+    module: "Sales",
+    description: "Created sale RC-00538",
+  },
+  {
+    id: "a5",
+    ts: addDays(today, -2).toISOString(),
+    userId: "u1",
+    action: "CREATE",
+    module: "Users",
+    description: "Added user Peter Mollel",
+  },
+  {
+    id: "a6",
+    ts: addDays(today, -3).toISOString(),
+    userId: "u2",
+    action: "UPDATE",
+    module: "Inventory",
+    description: "Adjusted stock for Coartem",
+  },
 ];
 
 const invLine = (productId: string, qty: number, discountPct = 0): SaleLine => {
@@ -221,61 +462,151 @@ const invLine = (productId: string, qty: number, discountPct = 0): SaleLine => {
 
 export const invoices: Invoice[] = [
   {
-    id: "inv1", invoiceNo: "INV-0001", customerId: "c1", customerName: "Fatuma Salim",
-    date: addDays(today, -45).toISOString(), dueDate: addDays(today, -15).toISOString(),
-    amount: 125000, paid: 125000, status: "PAID",
+    id: "inv1",
+    invoiceNo: "INV-0001",
+    customerId: "c1",
+    customerName: "Fatuma Salim",
+    date: addDays(today, -45).toISOString(),
+    dueDate: addDays(today, -15).toISOString(),
+    amount: 125000,
+    paid: 125000,
+    status: "PAID",
     lines: [invLine("p3", 5), invLine("p2", 5)],
   },
   {
-    id: "inv2", invoiceNo: "INV-0002", customerId: "c2", customerName: "Hassan Juma",
-    date: addDays(today, -20).toISOString(), dueDate: addDays(today, 10).toISOString(),
-    amount: 340000, paid: 100000, status: "PARTIAL",
+    id: "inv2",
+    invoiceNo: "INV-0002",
+    customerId: "c2",
+    customerName: "Hassan Juma",
+    date: addDays(today, -20).toISOString(),
+    dueDate: addDays(today, 10).toISOString(),
+    amount: 340000,
+    paid: 100000,
+    status: "PARTIAL",
     lines: [invLine("p15", 10), invLine("p18", 5)],
   },
   {
-    id: "inv3", invoiceNo: "INV-0003", customerId: "c3", customerName: "Mary Msigwa",
-    date: addDays(today, -50).toISOString(), dueDate: addDays(today, -20).toISOString(),
-    amount: 850000, paid: 200000, status: "OVERDUE",
+    id: "inv3",
+    invoiceNo: "INV-0003",
+    customerId: "c3",
+    customerName: "Mary Msigwa",
+    date: addDays(today, -50).toISOString(),
+    dueDate: addDays(today, -20).toISOString(),
+    amount: 850000,
+    paid: 200000,
+    status: "OVERDUE",
     lines: [invLine("p15", 30), invLine("p18", 10), invLine("p20", 4)],
   },
   {
-    id: "inv4", invoiceNo: "INV-0004", customerId: "c4", customerName: "Ahmed Rashid",
-    date: addDays(today, -3).toISOString(), dueDate: addDays(today, 27).toISOString(),
-    amount: 75000, paid: 0, status: "SENT",
+    id: "inv4",
+    invoiceNo: "INV-0004",
+    customerId: "c4",
+    customerName: "Ahmed Rashid",
+    date: addDays(today, -3).toISOString(),
+    dueDate: addDays(today, 27).toISOString(),
+    amount: 75000,
+    paid: 0,
+    status: "SENT",
     lines: [invLine("p1", 10), invLine("p10", 5)],
   },
   {
-    id: "inv5", invoiceNo: "INV-0005", customerId: "c5", customerName: "Lucia Mwamba",
-    date: addDays(today, -1).toISOString(), dueDate: addDays(today, 29).toISOString(),
-    amount: 50000, paid: 0, status: "DRAFT",
+    id: "inv5",
+    invoiceNo: "INV-0005",
+    customerId: "c5",
+    customerName: "Lucia Mwamba",
+    date: addDays(today, -1).toISOString(),
+    dueDate: addDays(today, 29).toISOString(),
+    amount: 50000,
+    paid: 0,
+    status: "DRAFT",
     lines: [invLine("p5", 5), invLine("p11", 5)],
   },
 ];
 
 export const supplierPayables: SupplierPayable[] = [
-  { id: "sp1", supplierId: "s1", supplierName: "Shelys Pharmaceuticals Ltd", reference: "INV-S-1001",
-    date: addDays(today, -25).toISOString(), dueDate: addDays(today, 5).toISOString(),
-    amount: 1250000, paid: 0, status: "OVERDUE" },
-  { id: "sp2", supplierId: "s1", supplierName: "Shelys Pharmaceuticals Ltd", reference: "INV-S-1002",
-    date: addDays(today, -15).toISOString(), dueDate: addDays(today, 15).toISOString(),
-    amount: 500000, paid: 0, status: "OUTSTANDING" },
-  { id: "sp3", supplierId: "s3", supplierName: "Dawa Limited", reference: "INV-D-2001",
-    date: addDays(today, -57).toISOString(), dueDate: addDays(today, 3).toISOString(),
-    amount: 3400000, paid: 0, status: "OVERDUE" },
-  { id: "sp4", supplierId: "s3", supplierName: "Dawa Limited", reference: "INV-D-2002",
-    date: addDays(today, -35).toISOString(), dueDate: addDays(today, 25).toISOString(),
-    amount: 800000, paid: 0, status: "OUTSTANDING" },
+  {
+    id: "sp1",
+    supplierId: "s1",
+    supplierName: "Shelys Pharmaceuticals Ltd",
+    reference: "INV-S-1001",
+    date: addDays(today, -25).toISOString(),
+    dueDate: addDays(today, 5).toISOString(),
+    amount: 1250000,
+    paid: 0,
+    status: "OVERDUE",
+  },
+  {
+    id: "sp2",
+    supplierId: "s1",
+    supplierName: "Shelys Pharmaceuticals Ltd",
+    reference: "INV-S-1002",
+    date: addDays(today, -15).toISOString(),
+    dueDate: addDays(today, 15).toISOString(),
+    amount: 500000,
+    paid: 0,
+    status: "OUTSTANDING",
+  },
+  {
+    id: "sp3",
+    supplierId: "s3",
+    supplierName: "Dawa Limited",
+    reference: "INV-D-2001",
+    date: addDays(today, -57).toISOString(),
+    dueDate: addDays(today, 3).toISOString(),
+    amount: 3400000,
+    paid: 0,
+    status: "OVERDUE",
+  },
+  {
+    id: "sp4",
+    supplierId: "s3",
+    supplierName: "Dawa Limited",
+    reference: "INV-D-2002",
+    date: addDays(today, -35).toISOString(),
+    dueDate: addDays(today, 25).toISOString(),
+    amount: 800000,
+    paid: 0,
+    status: "OUTSTANDING",
+  },
 ];
 
 export const insuranceProviders: InsuranceProvider[] = [
-  { id: "ins1", name: "NHIF", shortCode: "NHIF", claimEmail: "claims@nhif.or.tz", contactPerson: "Mr. Mwamba", active: true },
-  { id: "ins2", name: "AAR Health", shortCode: "AAR", claimEmail: "claims@aar.co.tz", contactPerson: "Ms. Khalid", active: true },
-  { id: "ins3", name: "Jubilee Allianz", shortCode: "JUBILEE", claimEmail: "claims@jubileetz.com", contactPerson: "Mr. Patel", active: true },
-  { id: "ins4", name: "Strategis Insurance", shortCode: "STRATEGIS", claimEmail: "claims@strategis.co.tz", contactPerson: "Ms. Mollel", active: true },
+  {
+    id: "ins1",
+    name: "NHIF",
+    shortCode: "NHIF",
+    claimEmail: "claims@nhif.or.tz",
+    contactPerson: "Mr. Mwamba",
+    active: true,
+  },
+  {
+    id: "ins2",
+    name: "AAR Health",
+    shortCode: "AAR",
+    claimEmail: "claims@aar.co.tz",
+    contactPerson: "Ms. Khalid",
+    active: true,
+  },
+  {
+    id: "ins3",
+    name: "Jubilee Allianz",
+    shortCode: "JUBILEE",
+    claimEmail: "claims@jubileetz.com",
+    contactPerson: "Mr. Patel",
+    active: true,
+  },
+  {
+    id: "ins4",
+    name: "Strategis Insurance",
+    shortCode: "STRATEGIS",
+    claimEmail: "claims@strategis.co.tz",
+    contactPerson: "Ms. Mollel",
+    active: true,
+  },
 ];
 
 // 8 products × 4 providers, with NHIF discounted 15-30% from sell price
-const insuredItems = ["p2","p4","p3","p12","p7","p6","p16","p5"]; // Amox, Coartem, Metformin, Folic, ORS, Omeprazole, Azithro, VitC
+const insuredItems = ["p2", "p4", "p3", "p12", "p7", "p6", "p16", "p5"]; // Amox, Coartem, Metformin, Folic, ORS, Omeprazole, Azithro, VitC
 export const insurancePrices: InsurancePrice[] = (() => {
   const out: InsurancePrice[] = [];
   let n = 1;
@@ -283,9 +614,11 @@ export const insurancePrices: InsurancePrice[] = (() => {
     insuredItems.forEach((pid) => {
       const p = products.find((x) => x.id === pid);
       if (!p) return;
-      const baseDiscount = prov.shortCode === "NHIF" ? 0.78 : prov.shortCode === "AAR" ? 0.85 : prov.shortCode === "JUBILEE" ? 0.88 : 0.82;
-      const insured = Math.round(p.sellPrice * baseDiscount / 50) * 50;
-      const copay = prov.shortCode === "NHIF" ? 0 : prov.shortCode === "AAR" ? 20 : prov.shortCode === "JUBILEE" ? 15 : 25;
+      const baseDiscount =
+        prov.shortCode === "NHIF" ? 0.78 : prov.shortCode === "AAR" ? 0.85 : prov.shortCode === "JUBILEE" ? 0.88 : 0.82;
+      const insured = Math.round((p.sellPrice * baseDiscount) / 50) * 50;
+      const copay =
+        prov.shortCode === "NHIF" ? 0 : prov.shortCode === "AAR" ? 20 : prov.shortCode === "JUBILEE" ? 15 : 25;
       out.push({ id: `inp${n++}`, providerId: prov.id, productId: pid, insuredPrice: insured, copayPercent: copay });
     });
   });
@@ -293,29 +626,159 @@ export const insurancePrices: InsurancePrice[] = (() => {
 })();
 
 export const adjustments: AdjustmentRecord[] = [
-  { id: "adj1", date: addDays(today, -2).toISOString(), productId: "p1", batchId: "b_p1_1", type: "Damaged",
-    qtyChange: -3, sohBefore: 45, sohAfter: 42, notes: "Crushed pack — water damage in storage", authorisedBy: "u2", branchId: "br_main" },
-  { id: "adj2", date: addDays(today, -5).toISOString(), productId: "p14", batchId: "b_p14_1", type: "Damaged",
-    qtyChange: -2, sohBefore: 18, sohAfter: 16, notes: "Tube punctured during transit from supplier", authorisedBy: "u2", branchId: "br_main" },
-  { id: "adj3", date: addDays(today, -7).toISOString(), productId: "p4", batchId: "b_p4_1", type: "Expired",
-    qtyChange: -4, sohBefore: 18, sohAfter: 14, notes: "Past expiry date — disposed via licensed handler", authorisedBy: "u1", branchId: "br_upanga" },
-  { id: "adj4", date: addDays(today, -10).toISOString(), productId: "p7", batchId: "b_p7_1", type: "Stocktake Correction",
-    qtyChange: 5, sohBefore: 60, sohAfter: 65, notes: "Found extra units during quarterly stocktake — system was under-counted", authorisedBy: "u1", branchId: "br_main" },
-  { id: "adj5", date: addDays(today, -12).toISOString(), productId: "p15", batchId: "b_p15_2", type: "Inter-Branch Transfer",
-    qtyChange: -10, sohBefore: 24, sohAfter: 14, notes: "Transferred 10 units to Upanga branch — urgent IV requirement", authorisedBy: "u2", branchId: "br_main" },
-  { id: "adj6", date: addDays(today, -15).toISOString(), productId: "p11", batchId: "b_p11_2", type: "Other",
-    qtyChange: 2, sohBefore: 40, sohAfter: 42, notes: "Returned by customer — unopened pack within return window", authorisedBy: "u2", branchId: "br_main" },
+  {
+    id: "adj1",
+    date: addDays(today, -2).toISOString(),
+    productId: "p1",
+    batchId: "b_p1_1",
+    type: "Damaged",
+    qtyChange: -3,
+    sohBefore: 45,
+    sohAfter: 42,
+    notes: "Crushed pack — water damage in storage",
+    authorisedBy: "u2",
+    branchId: "br_main",
+  },
+  {
+    id: "adj2",
+    date: addDays(today, -5).toISOString(),
+    productId: "p14",
+    batchId: "b_p14_1",
+    type: "Damaged",
+    qtyChange: -2,
+    sohBefore: 18,
+    sohAfter: 16,
+    notes: "Tube punctured during transit from supplier",
+    authorisedBy: "u2",
+    branchId: "br_main",
+  },
+  {
+    id: "adj3",
+    date: addDays(today, -7).toISOString(),
+    productId: "p4",
+    batchId: "b_p4_1",
+    type: "Expired",
+    qtyChange: -4,
+    sohBefore: 18,
+    sohAfter: 14,
+    notes: "Past expiry date — disposed via licensed handler",
+    authorisedBy: "u1",
+    branchId: "br_upanga",
+  },
+  {
+    id: "adj4",
+    date: addDays(today, -10).toISOString(),
+    productId: "p7",
+    batchId: "b_p7_1",
+    type: "Stocktake Correction",
+    qtyChange: 5,
+    sohBefore: 60,
+    sohAfter: 65,
+    notes: "Found extra units during quarterly stocktake — system was under-counted",
+    authorisedBy: "u1",
+    branchId: "br_main",
+  },
+  {
+    id: "adj5",
+    date: addDays(today, -12).toISOString(),
+    productId: "p15",
+    batchId: "b_p15_2",
+    type: "Inter-Branch Transfer",
+    qtyChange: -10,
+    sohBefore: 24,
+    sohAfter: 14,
+    notes: "Transferred 10 units to Upanga branch — urgent IV requirement",
+    authorisedBy: "u2",
+    branchId: "br_main",
+  },
+  {
+    id: "adj6",
+    date: addDays(today, -15).toISOString(),
+    productId: "p11",
+    batchId: "b_p11_2",
+    type: "Other",
+    qtyChange: 2,
+    sohBefore: 40,
+    sohAfter: 42,
+    notes: "Returned by customer — unopened pack within return window",
+    authorisedBy: "u2",
+    branchId: "br_main",
+  },
 ];
 
 export const expenses: Expense[] = [
-  { id: "ex1", date: addDays(today, -2).toISOString(), category: "Salaries", description: "Pharmacist salary — Apr", amount: 2200000, branchId: "br_main", recordedBy: "u1" },
-  { id: "ex2", date: addDays(today, -2).toISOString(), category: "Salaries", description: "Cashier & support staff — Apr", amount: 1650000, branchId: "br_main", recordedBy: "u1" },
-  { id: "ex3", date: addDays(today, -5).toISOString(), category: "Rent", description: "Monthly rent — Kariakoo store", amount: 1100000, branchId: "br_main", recordedBy: "u1" },
-  { id: "ex4", date: addDays(today, -7).toISOString(), category: "Utilities", description: "Tanesco electricity bill", amount: 245000, branchId: "br_main", recordedBy: "u1" },
-  { id: "ex5", date: addDays(today, -8).toISOString(), category: "Utilities", description: "Water & internet", amount: 175000, branchId: "br_upanga", recordedBy: "u1" },
-  { id: "ex6", date: addDays(today, -12).toISOString(), category: "Supplies", description: "Receipt paper & POS consumables", amount: 145000, branchId: "br_main", recordedBy: "u2" },
-  { id: "ex7", date: addDays(today, -14).toISOString(), category: "Supplies", description: "Cleaning supplies & PPE", amount: 95000, branchId: "br_upanga", recordedBy: "u2" },
-  { id: "ex8", date: addDays(today, -18).toISOString(), category: "Other", description: "Pharmacy Council of TZ — annual fee", amount: 320000, branchId: "br_main", recordedBy: "u1" },
+  {
+    id: "ex1",
+    date: addDays(today, -2).toISOString(),
+    category: "Salaries",
+    description: "Pharmacist salary — Apr",
+    amount: 2200000,
+    branchId: "br_main",
+    recordedBy: "u1",
+  },
+  {
+    id: "ex2",
+    date: addDays(today, -2).toISOString(),
+    category: "Salaries",
+    description: "Cashier & support staff — Apr",
+    amount: 1650000,
+    branchId: "br_main",
+    recordedBy: "u1",
+  },
+  {
+    id: "ex3",
+    date: addDays(today, -5).toISOString(),
+    category: "Rent",
+    description: "Monthly rent — Kariakoo store",
+    amount: 1100000,
+    branchId: "br_main",
+    recordedBy: "u1",
+  },
+  {
+    id: "ex4",
+    date: addDays(today, -7).toISOString(),
+    category: "Utilities",
+    description: "Tanesco electricity bill",
+    amount: 245000,
+    branchId: "br_main",
+    recordedBy: "u1",
+  },
+  {
+    id: "ex5",
+    date: addDays(today, -8).toISOString(),
+    category: "Utilities",
+    description: "Water & internet",
+    amount: 175000,
+    branchId: "br_upanga",
+    recordedBy: "u1",
+  },
+  {
+    id: "ex6",
+    date: addDays(today, -12).toISOString(),
+    category: "Supplies",
+    description: "Receipt paper & POS consumables",
+    amount: 145000,
+    branchId: "br_main",
+    recordedBy: "u2",
+  },
+  {
+    id: "ex7",
+    date: addDays(today, -14).toISOString(),
+    category: "Supplies",
+    description: "Cleaning supplies & PPE",
+    amount: 95000,
+    branchId: "br_upanga",
+    recordedBy: "u2",
+  },
+  {
+    id: "ex8",
+    date: addDays(today, -18).toISOString(),
+    category: "Other",
+    description: "Pharmacy Council of TZ — annual fee",
+    amount: 320000,
+    branchId: "br_main",
+    recordedBy: "u1",
+  },
 ];
 
 export const systemDefaults = {
