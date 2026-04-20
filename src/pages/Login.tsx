@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useApp } from "@/context/AppContext";
 import { useNavigate } from "react-router-dom";
-import { Wordmark } from "@/components/brand/Logo";
+import { BrandLockup } from "@/components/brand/Logo";
 import { toast } from "sonner";
 import { Info } from "lucide-react";
 
@@ -48,8 +48,8 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-muted/40 p-4">
       <div className="w-full max-w-md">
         <Card className="p-8 shadow-sm border">
-          <div className="flex justify-center mb-6">
-            <Wordmark size="lg" />
+          <div className="flex justify-center mb-4">
+            <BrandLockup width={260} />
           </div>
           <h2 className="text-lg font-semibold text-center mb-1">Sign in to your account</h2>
           <p className="text-sm text-muted-foreground text-center mb-6">Enter your credentials below.</p>
