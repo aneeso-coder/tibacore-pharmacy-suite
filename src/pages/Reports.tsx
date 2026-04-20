@@ -2,12 +2,12 @@ import { useMemo, useState, ReactNode } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/ui-ext/Page";
 import { Card } from "@/components/ui/card";
-import { sales, products, batches, suppliers, purchaseOrders, invoices, customers } from "@/data/seed";
+import { sales, products, batches, suppliers, purchaseOrders, invoices, customers, prescriptions, insuranceProviders, insurancePrices, expenses } from "@/data/seed";
 import { fmtTZS, fmtDate } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Download, FileText, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, LineChart, Line, Legend } from "recharts";
 import { useApp } from "@/context/AppContext";
 import { TraBadge, StatusBadge } from "@/components/ui-ext/Badges";
 import { cn } from "@/lib/utils";
@@ -38,6 +38,11 @@ const SECTIONS: Section[] = [
     { key: "valuation", label: "Stock Valuation", perm: "see_prices" },
     { key: "stock-total", label: "Total Stock Value", perm: "see_prices" },
     { key: "spend", label: "Supplier Spend", perm: "see_prices" },
+    { key: "pl", label: "P&L Report", perm: "see_prices" },
+    { key: "financial-summary", label: "Financial Summary", perm: "see_prices" },
+  ]},
+  { label: "Insurance", tabs: [
+    { key: "insurance-claims", label: "Insurance Claims", perm: "see_prices" },
   ]},
   { label: "Compliance", tabs: [
     { key: "tra", label: "TRA Summary", perm: "tra_settings" },
@@ -434,6 +439,16 @@ function ReportBody({ kind, range }: { kind: string; range: { from: Date; to: Da
         </Table>
       </Card>
     );
+  }
+
+  if (kind === "insurance-claims") return <InsuranceClaimsReport range={range} />;
+  if (kind === "pl") {
+    if (!showBuyPrices) return <Card className="p-8 text-center text-sm text-muted-foreground">You don't have permission to view this report.</Card>;
+    return <PLReport range={range} />;
+  }
+  if (kind === "financial-summary") {
+    if (!showBuyPrices) return <Card className="p-8 text-center text-sm text-muted-foreground">You don't have permission to view this report.</Card>;
+    return <FinancialSummaryReport range={range} />;
   }
 
   if (kind === "custom") return <CustomReportBuilder range={range} />;
@@ -1054,5 +1069,350 @@ function SimpleTable({ headers, rows }: { headers: string[]; rows: (string | num
         </TableBody>
       </Table>
     </Card>
+  );
+}
+
+// ────────────────────────────────────────────────────
+// B3 — Insurance Claims Report
+// ────────────────────────────────────────────────────
+function InsuranceClaimsReport({ range }: { range: { from: Date; to: Date } }) {
+  const [insurer, setInsurer] = useState<string>("ALL");
+
+  const claims = useMemo(() => {
+    const all: Array<{ id: string; provider: typeof insuranceProviders[0]; rxNo: string; patient: string; date: string; items: number; insurerAmount: number; copay: number; status: "Pending Claim" | "Submitted" | "Paid" }> = [];
+    prescriptions.forEach((rx, idx) => {
+      const prov = insuranceProviders[idx % insuranceProviders.length];
+      const lineCalc = rx.lines.reduce((acc, l) => {
+        const ip = insurancePrices.find((x) => x.providerId === prov.id && x.productId === l.productId);
+        const product = products.find((p) => p.id === l.productId);
+        const unit = ip?.insuredPrice ?? product?.sellPrice ?? 0;
+        const subtotal = unit * l.prescribedQty;
+        const copayPct = ip?.copayPercent ?? 0;
+        return {
+          insurer: acc.insurer + subtotal * (1 - copayPct / 100),
+          patient: acc.patient + subtotal * (copayPct / 100),
+        };
+      }, { insurer: 0, patient: 0 });
+      const status: "Pending Claim" | "Submitted" | "Paid" = idx % 3 === 0 ? "Paid" : idx % 3 === 1 ? "Submitted" : "Pending Claim";
+      all.push({
+        id: rx.id, provider: prov, rxNo: rx.rxNo, patient: rx.patient,
+        date: rx.date, items: rx.lines.length,
+        insurerAmount: lineCalc.insurer, copay: lineCalc.patient, status,
+      });
+    });
+    return all;
+  }, []);
+
+  const filtered = claims.filter((c) => {
+    if (insurer !== "ALL" && c.provider.id !== insurer) return false;
+    const d = new Date(c.date);
+    return d >= range.from && d <= range.to;
+  });
+
+  const totalClaims = filtered.length;
+  const totalValue = filtered.reduce((a, c) => a + c.insurerAmount + c.copay, 0);
+  const totalCopay = filtered.reduce((a, c) => a + c.copay, 0);
+  const netReceivable = filtered.filter((c) => c.status !== "Paid").reduce((a, c) => a + c.insurerAmount, 0);
+
+  const statusTone = (s: string) => s === "Paid" ? "bg-success/10 text-success" : s === "Submitted" ? "bg-info/10 text-info" : "bg-warning/10 text-warning";
+
+  return (
+    <>
+      <Card className="p-3 mb-4 flex items-center gap-3 flex-wrap">
+        <Label className="text-xs text-muted-foreground">Insurer:</Label>
+        <Select value={insurer} onValueChange={setInsurer}>
+          <SelectTrigger className="w-56 h-9"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ALL">All Insurers</SelectItem>
+            {insuranceProviders.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Button size="sm" variant="outline" className="ml-auto" onClick={() => toast.success(`Claim report${insurer !== "ALL" ? ` for ${insuranceProviders.find((p) => p.id === insurer)?.name}` : ""} exported (demo)`)}>
+          <Download className="h-4 w-4 mr-1.5" /> Export Claim Report
+        </Button>
+      </Card>
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+        <Card className="p-4"><Stat label="Total Claims" value={totalClaims} /></Card>
+        <Card className="p-4"><Stat label="Total Claim Value" value={fmtTZS(totalValue)} /></Card>
+        <Card className="p-4"><Stat label="Patient Co-pay" value={fmtTZS(totalCopay)} /></Card>
+        <Card className="p-4"><Stat label="Net Insurer Receivable" value={fmtTZS(netReceivable)} /></Card>
+      </div>
+
+      <Card className="overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Insurer</TableHead>
+              <TableHead>Rx No.</TableHead>
+              <TableHead>Patient</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead className="text-right">Items</TableHead>
+              <TableHead className="text-right">Insurer Amount</TableHead>
+              <TableHead className="text-right">Co-pay</TableHead>
+              <TableHead>Status</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filtered.length === 0 ? (
+              <TableRow><TableCell colSpan={8} className="text-center text-sm text-muted-foreground py-10">No claims for the selected period</TableCell></TableRow>
+            ) : filtered.map((c) => (
+              <TableRow key={c.id}>
+                <TableCell><span className="text-xs font-medium px-2 py-0.5 rounded-md bg-muted">{c.provider.shortCode}</span></TableCell>
+                <TableCell className="num font-medium">{c.rxNo}</TableCell>
+                <TableCell>{c.patient}</TableCell>
+                <TableCell className="num text-xs">{fmtDate(c.date)}</TableCell>
+                <TableCell className="text-right num">{c.items}</TableCell>
+                <TableCell className="text-right num">{fmtTZS(c.insurerAmount)}</TableCell>
+                <TableCell className="text-right num">{fmtTZS(c.copay)}</TableCell>
+                <TableCell><span className={cn("text-xs px-2 py-0.5 rounded-md", statusTone(c.status))}>{c.status}</span></TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Card>
+    </>
+  );
+}
+
+// ────────────────────────────────────────────────────
+// B4 — P&L Report
+// ────────────────────────────────────────────────────
+function PLReport({ range }: { range: { from: Date; to: Date } }) {
+  const inRange = (iso: string) => { const d = new Date(iso); return d >= range.from && d <= range.to; };
+  const periodSales = sales.filter((s) => inRange(s.date));
+  const grossSales = periodSales.reduce((a, s) => a + s.subtotal, 0);
+  const discounts = periodSales.reduce((a, s) => a + s.discountTotal, 0);
+  const netRevenue = grossSales - discounts;
+
+  const cogs = periodSales.reduce((acc, s) => acc + s.lines.reduce((b, l) => {
+    const p = products.find((x) => x.id === l.productId);
+    return b + (p ? p.buyPrice * l.qty : 0);
+  }, 0), 0);
+
+  const openingStock = 12_000_000;
+  const purchasesPeriod = purchaseOrders.filter((po) => inRange(po.date)).reduce((a, po) => a + po.total, 0);
+  const closingStock = openingStock + purchasesPeriod - cogs;
+
+  const grossProfit = netRevenue - cogs;
+  const grossMarginPct = netRevenue > 0 ? (grossProfit / netRevenue) * 100 : 0;
+
+  const periodExpenses = expenses.filter((e) => inRange(e.date));
+  const expByCat = periodExpenses.reduce((acc, e) => {
+    acc[e.category] = (acc[e.category] ?? 0) + e.amount;
+    return acc;
+  }, {} as Record<string, number>);
+  const totalExpenses = periodExpenses.reduce((a, e) => a + e.amount, 0);
+
+  const netProfit = grossProfit - totalExpenses;
+  const netMarginPct = netRevenue > 0 ? (netProfit / netRevenue) * 100 : 0;
+
+  const chartData = [
+    { name: "Revenue", value: netRevenue },
+    { name: "COGS", value: cogs },
+    { name: "Expenses", value: totalExpenses },
+    { name: "Profit", value: netProfit },
+  ];
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <Card className="p-6 lg:col-span-2 font-mono text-sm">
+        <h3 className="font-sans font-semibold text-base mb-4">Profit &amp; Loss Statement</h3>
+        <div className="space-y-1">
+          <PLSection label="REVENUE">
+            <PLRow label="Gross Sales" value={grossSales} />
+            <PLRow label="Less: Discounts Given" value={-discounts} />
+            <PLDivider />
+            <PLRow label="Net Revenue" value={netRevenue} bold />
+          </PLSection>
+
+          <PLSection label="COST OF GOODS SOLD">
+            <PLRow label="Opening Stock Value" value={openingStock} />
+            <PLRow label="Plus: Purchases This Period" value={purchasesPeriod} />
+            <PLRow label="Less: Closing Stock Value" value={-closingStock} />
+            <PLDivider />
+            <PLRow label="COGS" value={cogs} bold />
+          </PLSection>
+
+          <div className="py-2 border-t-2 border-double mt-2">
+            <PLRow label="GROSS PROFIT" value={grossProfit} bold large />
+            <div className="flex justify-between text-xs text-muted-foreground pl-4 mt-1">
+              <span>Gross Margin %</span>
+              <span className="num">{grossMarginPct.toFixed(1)}%</span>
+            </div>
+          </div>
+
+          <PLSection label="OPERATING EXPENSES">
+            {Object.entries(expByCat).map(([cat, amt]) => (
+              <PLRow key={cat} label={cat} value={amt} />
+            ))}
+            {Object.keys(expByCat).length === 0 && <PLRow label="(No expenses recorded)" value={0} />}
+            <PLDivider />
+            <PLRow label="Total Expenses" value={totalExpenses} bold />
+          </PLSection>
+
+          <div className="py-3 border-t-2 border-double mt-2 bg-primary/5 -mx-6 px-6 rounded">
+            <PLRow label={netProfit >= 0 ? "NET PROFIT" : "NET LOSS"} value={netProfit} bold large />
+            <div className="flex justify-between text-xs text-muted-foreground pl-4 mt-1">
+              <span>Net Margin %</span>
+              <span className="num">{netMarginPct.toFixed(1)}%</span>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      <Card className="p-5">
+        <h3 className="font-medium text-sm mb-4">Snapshot</h3>
+        <div className="h-72">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={chartData} layout="vertical">
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis type="number" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => `${(v/1_000_000).toFixed(1)}M`} />
+              <YAxis dataKey="name" type="category" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} width={70} />
+              <Tooltip formatter={(v: any) => fmtTZS(Number(v))} contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 6, fontSize: 12 }} />
+              <Bar dataKey="value" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function PLSection({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="py-2">
+      <div className="text-xs font-bold tracking-wider mb-1 font-sans">{label}</div>
+      <div className="pl-4 space-y-0.5">{children}</div>
+    </div>
+  );
+}
+
+function PLRow({ label, value, bold, large }: { label: string; value: number; bold?: boolean; large?: boolean }) {
+  return (
+    <div className={cn("flex justify-between", bold && "font-semibold", large && "text-base")}>
+      <span className={cn(bold && "font-sans")}>{label}</span>
+      <span className="num">{fmtTZS(value)}</span>
+    </div>
+  );
+}
+
+function PLDivider() {
+  return <div className="border-t border-dashed my-1" />;
+}
+
+// ────────────────────────────────────────────────────
+// B4 — Financial Summary Report
+// ────────────────────────────────────────────────────
+function FinancialSummaryReport({ range }: { range: { from: Date; to: Date } }) {
+  const inRange = (from: Date, to: Date, iso: string) => { const d = new Date(iso); return d >= from && d <= to; };
+  const now = new Date();
+
+  const thisMonthFrom = new Date(now.getFullYear(), now.getMonth(), 1);
+  const thisMonthTo = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+  const lastMonthFrom = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const lastMonthTo = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
+
+  const thisMonth = sales.filter((s) => inRange(thisMonthFrom, thisMonthTo, s.date));
+  const lastMonth = sales.filter((s) => inRange(lastMonthFrom, lastMonthTo, s.date));
+  const periodSales = sales.filter((s) => inRange(range.from, range.to, s.date));
+
+  const revThis = thisMonth.reduce((a, s) => a + s.total, 0);
+  const revLast = lastMonth.reduce((a, s) => a + s.total, 0);
+  const momPct = revLast > 0 ? ((revThis - revLast) / revLast) * 100 : 0;
+
+  const cogsThis = thisMonth.reduce((acc, s) => acc + s.lines.reduce((b, l) => {
+    const p = products.find((x) => x.id === l.productId);
+    return b + (p ? p.buyPrice * l.qty : 0);
+  }, 0), 0);
+  const grossProfitThis = revThis - cogsThis;
+
+  const dayBuckets: Record<string, number> = {};
+  periodSales.forEach((s) => {
+    const k = new Date(s.date).toISOString().slice(0, 10);
+    dayBuckets[k] = (dayBuckets[k] ?? 0) + s.total;
+  });
+  const bestEntry = Object.entries(dayBuckets).sort(([, a], [, b]) => b - a)[0];
+  const bestDay = bestEntry ? `${fmtDate(bestEntry[0])} (${fmtTZS(bestEntry[1])})` : "—";
+
+  const avgTx = periodSales.length > 0 ? periodSales.reduce((a, s) => a + s.total, 0) / periodSales.length : 0;
+
+  const months = Array.from({ length: 6 }).map((_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
+    const from = d;
+    const to = new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59);
+    const m = sales.filter((s) => inRange(from, to, s.date));
+    const rev = m.reduce((a, s) => a + s.total, 0);
+    const cogs = m.reduce((acc, s) => acc + s.lines.reduce((b, l) => {
+      const p = products.find((x) => x.id === l.productId);
+      return b + (p ? p.buyPrice * l.qty : 0);
+    }, 0), 0);
+    return { month: d.toLocaleDateString("en-US", { month: "short" }), revenue: rev, profit: rev - cogs };
+  });
+
+  const catRev: Record<string, number> = {};
+  periodSales.forEach((s) => s.lines.forEach((l) => {
+    const p = products.find((x) => x.id === l.productId);
+    if (!p) return;
+    catRev[p.category] = (catRev[p.category] ?? 0) + l.lineTotal;
+  }));
+  const catData = Object.entries(catRev).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
+
+  return (
+    <>
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
+        <Card className="p-4"><Stat label="Revenue This Month" value={fmtTZS(revThis)} /></Card>
+        <Card className="p-4"><Stat label="Revenue Last Month" value={fmtTZS(revLast)} /></Card>
+        <Card className="p-4">
+          <div className="text-xs uppercase tracking-wider text-muted-foreground font-medium">MoM Change</div>
+          <div className={cn("text-xl font-semibold num mt-1", momPct >= 0 ? "text-success" : "text-destructive")}>
+            {momPct >= 0 ? "+" : ""}{momPct.toFixed(1)}%
+          </div>
+        </Card>
+        <Card className="p-4"><Stat label="Gross Profit This Month" value={fmtTZS(grossProfitThis)} /></Card>
+        <Card className="p-4"><Stat label="Best Day (period)" value={bestDay} /></Card>
+        <Card className="p-4"><Stat label="Avg Transaction" value={fmtTZS(avgTx)} /></Card>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+        <Card className="p-5">
+          <h3 className="font-medium text-sm mb-3">Revenue vs Gross Profit (last 6 months)</h3>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={months}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="month" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
+                <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => `${(v/1_000_000).toFixed(1)}M`} />
+                <Tooltip formatter={(v: any) => fmtTZS(Number(v))} contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 6, fontSize: 12 }} />
+                <Legend wrapperStyle={{ fontSize: 11 }} />
+                <Line type="monotone" dataKey="revenue" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 3 }} />
+                <Line type="monotone" dataKey="profit" stroke="hsl(var(--success))" strokeWidth={2} dot={{ r: 3 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
+
+        <Card className="p-5">
+          <h3 className="font-medium text-sm mb-3">Category Revenue (period)</h3>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={catData} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis type="number" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} />
+                <YAxis dataKey="name" type="category" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} width={90} />
+                <Tooltip formatter={(v: any) => fmtTZS(Number(v))} contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 6, fontSize: 12 }} />
+                <Bar dataKey="value" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
+      </div>
+
+      <div className="flex justify-end">
+        <Button size="sm" variant="outline" onClick={() => toast.success("Financial summary exported (demo)")}>
+          <Download className="h-4 w-4 mr-1.5" /> Export Financial Summary
+        </Button>
+      </div>
+    </>
   );
 }
