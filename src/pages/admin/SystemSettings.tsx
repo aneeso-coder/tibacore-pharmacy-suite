@@ -191,6 +191,10 @@ export default function SystemSettings() {
             </div>
           </Card>
         </TabsContent>
+
+        <TabsContent value="expenses">
+          <ExpensesTab />
+        </TabsContent>
       </Tabs>
 
       <Sheet open={branchSheet.open} onOpenChange={(o) => !o && setBranchSheet({ open: false })}>
