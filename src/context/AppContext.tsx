@@ -103,6 +103,23 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
 export const useApp = () => {
   const ctx = useContext(Ctx);
-  if (!ctx) throw new Error("useApp outside provider");
+  if (!ctx) {
+    // Defensive: should not happen because AppProvider wraps the tree in App.tsx.
+    // Return a safe default so the UI degrades to the login screen instead of crashing.
+    console.warn("useApp called outside AppProvider — returning safe default");
+    return {
+      user: null,
+      branch: branches[0],
+      branches,
+      org: ORG,
+      setBranch: () => {},
+      login: () => ({ ok: false, error: "Provider not ready" }),
+      logout: () => {},
+      can: () => false,
+      showPrices: false,
+      showBuyPrices: false,
+    } as AppCtx;
+  }
   return ctx;
 };
+
