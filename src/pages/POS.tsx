@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useApp } from "@/context/AppContext";
 import { products, customers } from "@/data/seed";
 import type { Product, PaymentMethod } from "@/data/types";
@@ -8,8 +8,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { fmtTZS } from "@/lib/format";
 import { Wordmark } from "@/components/brand/Logo";
-import { X, Search, Plus, Minus, Trash2, ShoppingCart } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { X, Search, Plus, Minus, Trash2, ShoppingCart, FileText } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -21,6 +21,7 @@ interface Line {
 export default function POS() {
   const { user, branch } = useApp();
   const nav = useNavigate();
+  const location = useLocation();
   const [query, setQuery] = useState("");
   const [cart, setCart] = useState<Line[]>([]);
   const [customer, setCustomer] = useState<string>("Walk-in");
@@ -30,6 +31,35 @@ export default function POS() {
   const [lastReceipt, setLastReceipt] = useState<any>(null);
   const [receiptNo, setReceiptNo] = useState(() => `RC-${String(Date.now()).slice(-5)}`);
   const [traCode] = useState(() => `RCT${Math.floor(Math.random() * 900000 + 100000)}`);
+  const [rxMode, setRxMode] = useState(false);
+  const [rxId, setRxId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const state: any = location.state;
+    if (state?.rxLines) {
+      const rxCart = state.rxLines
+        .map((l: any) => {
+          const product = products.find((p) => p.id === l.productId);
+          if (!product) return null;
+          const remaining = l.prescribedQty - l.dispensedQty;
+          if (remaining <= 0) return null;
+          return {
+            productId: product.id,
+            name: product.name,
+            qty: remaining,
+            unitPrice: product.sellPrice,
+            discountPct: 0,
+            taxCode: product.taxCode,
+          };
+        })
+        .filter(Boolean) as Line[];
+      setCart(rxCart);
+      setRxMode(true);
+      setRxId(state.rxId ?? null);
+      window.history.replaceState({}, "");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const stockKey = branch.id === "br_main" ? "stockMain" : "stockUpanga";
 
