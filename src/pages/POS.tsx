@@ -15,7 +15,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 interface Line {
-  productId: string; name: string; qty: number; unitPrice: number; discountPct: number; taxCode: "A" | "C" | "E";
+  productId: string; name: string; qty: number; unitPrice: number; discountPct: number; taxCode: import("@/data/types").TaxCode;
 }
 
 export default function POS() {
