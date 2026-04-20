@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { fmtDateTime, fmtTZS } from "@/lib/format";
 import { sales } from "@/data/seed";
 import { toast } from "sonner";
-import { ShieldCheck, RefreshCw } from "lucide-react";
+import { ShieldCheck, RefreshCw, AlertTriangle } from "lucide-react";
 
 export default function TraSettings() {
   const queue = sales.slice(0, 20);
@@ -51,6 +51,10 @@ export default function TraSettings() {
           <div className="space-y-2 text-sm">
             <Row k="Token expires in" v="58 minutes" />
             <Row k="Global Counter (GC)" v="000054271" />
+            <div className="flex items-center gap-1.5 text-xs text-warning">
+              <AlertTriangle className="h-3 w-3" />
+              <span>This counter must never be reset. Each receipt issued increments this permanently.</span>
+            </div>
             <Row k="Daily Counter (DC)" v="00038" />
             <Row k="Last ZNUM" v="ZN-20250419-001" />
           </div>
