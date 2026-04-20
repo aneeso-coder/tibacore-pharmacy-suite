@@ -25,6 +25,9 @@ import Users from "./pages/admin/Users";
 import AuditLog from "./pages/admin/AuditLog";
 import TraSettings from "./pages/admin/TraSettings";
 import SystemSettings from "./pages/admin/SystemSettings";
+import Debtors from "./pages/Debtors";
+import Creditors from "./pages/Creditors";
+import Invoices from "./pages/Invoices";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -54,6 +57,9 @@ const App = () => (
               <Route path="/grn" element={<Protected perm="purchasing"><GoodsReceived /></Protected>} />
               <Route path="/reports" element={<Navigate to="/reports/sales" replace />} />
               <Route path="/reports/:kind" element={<Protected perm="reports"><Reports /></Protected>} />
+              <Route path="/debtors" element={<Protected perm="debtors"><Debtors /></Protected>} />
+              <Route path="/creditors" element={<Protected perm="creditors"><Creditors /></Protected>} />
+              <Route path="/invoices" element={<Protected perm="invoices"><Invoices /></Protected>} />
               <Route path="/admin/users" element={<Protected perm="users"><Users /></Protected>} />
               <Route path="/admin/audit" element={<Protected perm="audit"><AuditLog /></Protected>} />
               <Route path="/admin/tra" element={<Protected perm="tra_settings"><TraSettings /></Protected>} />

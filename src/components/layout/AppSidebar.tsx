@@ -5,6 +5,7 @@ import {
   LayoutDashboard, ShoppingCart, Receipt, FileText, Users, Package, Boxes,
   Layers, ClipboardList, Truck, ShoppingBag, PackageCheck, BarChart3, FileBarChart,
   Wallet, FileCheck2, ShieldCheck, ScrollText, Settings, Cog, Building2, ChevronDown,
+  TrendingUp, TrendingDown,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -22,6 +23,8 @@ const groups: Group[] = [
     { to: "/sales", label: "Sales History", icon: Receipt },
     { to: "/prescriptions", label: "Prescriptions", icon: FileText, perm: "inventory" },
     { to: "/customers", label: "Customers", icon: Users, perm: "inventory" },
+    { to: "/debtors", label: "Debtors", icon: TrendingUp, perm: "debtors" },
+    { to: "/invoices", label: "Invoices", icon: FileText, perm: "invoices" },
   ]},
   { label: "Inventory", perm: "inventory", items: [
     { to: "/products", label: "Products", icon: Package },
@@ -33,6 +36,7 @@ const groups: Group[] = [
     { to: "/purchase-orders", label: "Purchase Orders", icon: ShoppingBag },
     { to: "/suppliers", label: "Suppliers", icon: Truck },
     { to: "/grn", label: "Goods Received", icon: PackageCheck },
+    { to: "/creditors", label: "Creditors", icon: TrendingDown, perm: "creditors" },
   ]},
   { label: "Reports", perm: "reports", items: [
     { to: "/reports/sales", label: "Sales Reports", icon: BarChart3 },

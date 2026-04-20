@@ -1,5 +1,5 @@
 import type {
-  Branch, User, Product, Supplier, Customer, Batch, Sale, Prescription, PurchaseOrder, AuditEntry, TaxCode,
+  Branch, User, Product, Supplier, Customer, Batch, Sale, Prescription, PurchaseOrder, AuditEntry, TaxCode, Invoice, SupplierPayable, SaleLine,
 } from "./types";
 
 export const ORG = {
@@ -71,9 +71,9 @@ export const products: Product[] = [
 ];
 
 export const suppliers: Supplier[] = [
-  { id: "s1", name: "Shelys Pharmaceuticals Ltd", contact: "Mr. Karim", phone: "+255713000111", email: "sales@shelys.co.tz", productIds: ["p2","p3","p4","p9","p15","p16"] },
-  { id: "s2", name: "Cosmos Limited", contact: "Ms. Neema", phone: "+255713000222", email: "orders@cosmos.co.tz", productIds: ["p1","p5","p6","p7","p8","p10","p11","p12","p13","p17","p19"] },
-  { id: "s3", name: "Dawa Limited", contact: "Mr. Joseph", phone: "+255713000333", email: "info@dawa.co.tz", productIds: ["p14","p15","p18","p20"] },
+  { id: "s1", name: "Shelys Pharmaceuticals Ltd", contact: "Mr. Karim", phone: "+255713000111", email: "sales@shelys.co.tz", productIds: ["p2","p3","p4","p9","p15","p16"], tin: "111-222-333", address: "Pugu Road, Dar es Salaam", paymentTerms: "30_days", creditLimit: 5000000, outstandingBalance: 1250000, active: true },
+  { id: "s2", name: "Cosmos Limited", contact: "Ms. Neema", phone: "+255713000222", email: "orders@cosmos.co.tz", productIds: ["p1","p5","p6","p7","p8","p10","p11","p12","p13","p17","p19"], tin: "444-555-666", address: "Kariakoo Market, Dar es Salaam", paymentTerms: "COD", creditLimit: 0, outstandingBalance: 0, active: true },
+  { id: "s3", name: "Dawa Limited", contact: "Mr. Joseph", phone: "+255713000333", email: "info@dawa.co.tz", productIds: ["p14","p15","p18","p20"], tin: "777-888-999", address: "Industrial Area, Dar es Salaam", paymentTerms: "60_days", creditLimit: 8000000, outstandingBalance: 3400000, active: true },
 ];
 
 export const customers: Customer[] = [
@@ -209,4 +209,59 @@ export const auditLog: AuditEntry[] = [
   { id: "a4", ts: addDays(today, -1).toISOString(), userId: "u3", action: "CREATE", module: "Sales", description: "Created sale RC-00538" },
   { id: "a5", ts: addDays(today, -2).toISOString(), userId: "u1", action: "CREATE", module: "Users", description: "Added user Peter Mollel" },
   { id: "a6", ts: addDays(today, -3).toISOString(), userId: "u2", action: "UPDATE", module: "Inventory", description: "Adjusted stock for Coartem" },
+];
+
+const invLine = (productId: string, qty: number, discountPct = 0): SaleLine => {
+  const p = products.find((x) => x.id === productId)!;
+  const gross = qty * p.sellPrice;
+  const lineTotal = gross * (1 - discountPct / 100);
+  return { productId, name: p.name, qty, unitPrice: p.sellPrice, discountPct, taxCode: p.taxCode, lineTotal };
+};
+
+export const invoices: Invoice[] = [
+  {
+    id: "inv1", invoiceNo: "INV-0001", customerId: "c1", customerName: "Fatuma Salim",
+    date: addDays(today, -45).toISOString(), dueDate: addDays(today, -15).toISOString(),
+    amount: 125000, paid: 125000, status: "PAID",
+    lines: [invLine("p3", 5), invLine("p2", 5)],
+  },
+  {
+    id: "inv2", invoiceNo: "INV-0002", customerId: "c2", customerName: "Hassan Juma",
+    date: addDays(today, -20).toISOString(), dueDate: addDays(today, 10).toISOString(),
+    amount: 340000, paid: 100000, status: "PARTIAL",
+    lines: [invLine("p15", 10), invLine("p18", 5)],
+  },
+  {
+    id: "inv3", invoiceNo: "INV-0003", customerId: "c3", customerName: "Mary Msigwa",
+    date: addDays(today, -50).toISOString(), dueDate: addDays(today, -20).toISOString(),
+    amount: 850000, paid: 200000, status: "OVERDUE",
+    lines: [invLine("p15", 30), invLine("p18", 10), invLine("p20", 4)],
+  },
+  {
+    id: "inv4", invoiceNo: "INV-0004", customerId: "c4", customerName: "Ahmed Rashid",
+    date: addDays(today, -3).toISOString(), dueDate: addDays(today, 27).toISOString(),
+    amount: 75000, paid: 0, status: "SENT",
+    lines: [invLine("p1", 10), invLine("p10", 5)],
+  },
+  {
+    id: "inv5", invoiceNo: "INV-0005", customerId: "c5", customerName: "Lucia Mwamba",
+    date: addDays(today, -1).toISOString(), dueDate: addDays(today, 29).toISOString(),
+    amount: 50000, paid: 0, status: "DRAFT",
+    lines: [invLine("p5", 5), invLine("p11", 5)],
+  },
+];
+
+export const supplierPayables: SupplierPayable[] = [
+  { id: "sp1", supplierId: "s1", supplierName: "Shelys Pharmaceuticals Ltd", reference: "INV-S-1001",
+    date: addDays(today, -25).toISOString(), dueDate: addDays(today, 5).toISOString(),
+    amount: 1250000, paid: 0, status: "OVERDUE" },
+  { id: "sp2", supplierId: "s1", supplierName: "Shelys Pharmaceuticals Ltd", reference: "INV-S-1002",
+    date: addDays(today, -15).toISOString(), dueDate: addDays(today, 15).toISOString(),
+    amount: 500000, paid: 0, status: "OUTSTANDING" },
+  { id: "sp3", supplierId: "s3", supplierName: "Dawa Limited", reference: "INV-D-2001",
+    date: addDays(today, -57).toISOString(), dueDate: addDays(today, 3).toISOString(),
+    amount: 3400000, paid: 0, status: "OVERDUE" },
+  { id: "sp4", supplierId: "s3", supplierName: "Dawa Limited", reference: "INV-D-2002",
+    date: addDays(today, -35).toISOString(), dueDate: addDays(today, 25).toISOString(),
+    amount: 800000, paid: 0, status: "OUTSTANDING" },
 ];
