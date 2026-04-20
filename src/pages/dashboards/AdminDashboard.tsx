@@ -122,9 +122,17 @@ export default function AdminDashboard() {
 
   return (
     <>
-      {/* Row 1 — KPIs */}
+      {/* Row 1 — KPIs (clickable financial cards) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard label="Revenue Today" value={fmtTZS(revToday)} icon={<Banknote className="h-4 w-4" />} hint="All branches" />
+        <button onClick={() => nav("/reports/financial-summary")} className="text-left">
+          <Card className="p-5 hover:border-primary transition cursor-pointer h-full">
+            <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              <Package className="h-4 w-4" /> Total Stock Value
+            </div>
+            <div className="text-2xl font-semibold mt-1 num truncate text-success">{fmtTZS(stockValue)}</div>
+            <div className="text-[11px] text-muted-foreground mt-1">at cost — {branch.name}</div>
+          </Card>
+        </button>
         <Card className="p-5">
           <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Revenue</div>
           <div className="text-2xl font-semibold mt-1 num truncate">{fmtTZS(periodRev)}</div>
@@ -138,8 +146,27 @@ export default function AdminDashboard() {
             ))}
           </div>
         </Card>
-        <StatCard label="Total Stock Value" value={fmtTZS(stockValue)} icon={<Package className="h-4 w-4" />} tone="success" />
-        <StatCard label="Gross Profit (Month)" value={fmtTZS(grossProfitMonth)} icon={<Wallet className="h-4 w-4" />} tone="success" hint={`${grossMargin.toFixed(1)}% margin`} />
+        <button onClick={() => nav("/reports/pl")} className="text-left">
+          <Card className="p-5 hover:border-primary transition cursor-pointer h-full">
+            <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              <Wallet className="h-4 w-4" /> Gross Profit (Month)
+            </div>
+            <div className="text-2xl font-semibold mt-1 num truncate text-success">{fmtTZS(grossProfitMonth)}</div>
+            <div className="text-[11px] text-muted-foreground mt-1">{grossMargin.toFixed(1)}% margin</div>
+          </Card>
+        </button>
+        <button onClick={() => nav("/reports/insurance-claims")} className="text-left">
+          <Card className="p-5 hover:border-primary transition cursor-pointer h-full">
+            <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              <ShieldCheck className="h-4 w-4" /> Insurance Receivable
+            </div>
+            <div className="text-2xl font-semibold mt-1 num truncate">{fmtTZS(insuranceReceivable)}</div>
+            <div className="text-[11px] text-muted-foreground mt-1">unpaid claims outstanding</div>
+          </Card>
+        </button>
+      </div>
+      <div className="hidden">
+        <StatCard label="Revenue Today" value={fmtTZS(revToday)} icon={<Banknote className="h-4 w-4" />} />
       </div>
 
       {/* Row 2 — Charts */}
@@ -233,29 +260,29 @@ export default function AdminDashboard() {
         </Card>
       </div>
 
-      {/* Row 4 — P&L */}
+      {/* Row 4 — P&L Summary */}
       <Card className="p-5">
         <div className="font-medium mb-1">P&amp;L Summary — This Month</div>
-        <div className="text-xs text-muted-foreground mb-4">Derived from sales × buy prices</div>
+        <div className="text-xs text-muted-foreground mb-4">Derived from sales × buy prices, less recorded expenses</div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <PL label="Revenue" value={revMonth} />
+          <PL label="Net Revenue" value={revMonth} />
           <PL label="COGS" value={cogsMonth} />
           <PL label="Gross Profit" value={grossProfitMonth} tone="success" />
-          <div>
-            <div className="text-xs uppercase tracking-wider text-muted-foreground font-medium">Gross Margin</div>
-            <div className="text-2xl font-semibold num mt-1 text-success">{grossMargin.toFixed(1)}%</div>
-          </div>
+          <PL label="Net Profit" value={netProfitMonth} tone={netProfitMonth >= 0 ? "success" : "danger"} hint={`After ${fmtTZS(expensesMonth)} expenses`} />
         </div>
       </Card>
     </>
   );
 }
 
-function PL({ label, value, tone }: { label: string; value: number; tone?: "success" }) {
+function PL({ label, value, tone, hint }: { label: string; value: number; tone?: "success" | "danger"; hint?: string }) {
   return (
     <div>
       <div className="text-xs uppercase tracking-wider text-muted-foreground font-medium">{label}</div>
-      <div className={cn("text-2xl font-semibold num mt-1", tone === "success" && "text-success")}>{fmtTZS(value)}</div>
+      <div className={cn("text-2xl font-semibold num mt-1",
+        tone === "success" && "text-success",
+        tone === "danger" && "text-destructive")}>{fmtTZS(value)}</div>
+      {hint && <div className="text-[11px] text-muted-foreground mt-0.5">{hint}</div>}
     </div>
   );
 }
