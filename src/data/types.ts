@@ -1,7 +1,8 @@
 export type Role = "super_admin" | "pharmacist" | "cashier" | "viewer";
-export type TaxCode = "A" | "C" | "E"; // 18% / 0% / Exempt
-export type PaymentMethod = "CASH" | "MOBILE" | "CARD";
-export type TraStatus = "PENDING" | "SUBMITTED" | "FAILED";
+export type TaxCode = "A" | "C" | "E" | "B" | "D";
+export type PaymentMethod = "CASH" | "MOBILE" | "CARD" | "CREDIT";
+export type MobileProvider = "MPESA" | "TIGO_PESA" | "AIRTEL_MONEY" | "HALOPESA";
+export type TraStatus = "PENDING" | "SUBMITTED" | "FAILED" | "REVERSED" | "VOIDED";
 
 export interface Branch {
   id: string;
@@ -152,7 +153,56 @@ export interface AuditEntry {
   id: string;
   ts: string;
   userId: string;
-  action: "CREATE" | "UPDATE" | "DELETE" | "LOGIN";
+  action: "CREATE" | "UPDATE" | "DELETE" | "LOGIN" | "VOID";
   module: string;
   description: string;
+}
+
+export interface InsuranceProvider {
+  id: string;
+  name: string;
+  shortCode: string;
+  claimEmail: string;
+  contactPerson: string;
+  active: boolean;
+}
+
+export interface InsurancePrice {
+  id: string;
+  providerId: string;
+  productId: string;
+  insuredPrice: number;
+  copayPercent: number;
+}
+
+export interface AdjustmentRecord {
+  id: string;
+  date: string;
+  productId: string;
+  batchId: string;
+  type: "Damaged" | "Expired" | "Stocktake Correction" | "Inter-Branch Transfer" | "Other";
+  qtyChange: number;
+  sohBefore: number;
+  sohAfter: number;
+  notes: string;
+  authorisedBy: string;
+  branchId: string;
+}
+
+export interface Expense {
+  id: string;
+  date: string;
+  category: "Salaries" | "Rent" | "Utilities" | "Supplies" | "Marketing" | "Maintenance" | "Other";
+  description: string;
+  amount: number;
+  branchId: string;
+  recordedBy: string;
+}
+
+export interface SystemSettings {
+  allowCreditSales: boolean;
+  allowWalkIn: boolean;
+  requireCustomerForRx: boolean;
+  voidRequiresAuth: boolean;
+  vatDisplayMode: "auto" | "full";
 }
