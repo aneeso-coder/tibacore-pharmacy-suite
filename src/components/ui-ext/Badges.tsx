@@ -6,6 +6,8 @@ const map: Record<TraStatus, { label: string; cls: string }> = {
   SUBMITTED: { label: "Submitted", cls: "bg-success/15 text-success border-success/30" },
   PENDING: { label: "Pending", cls: "bg-warning/15 text-warning border-warning/30" },
   FAILED: { label: "Failed", cls: "bg-destructive/15 text-destructive border-destructive/30" },
+  REVERSED: { label: "Reversed", cls: "bg-muted text-muted-foreground border-border" },
+  VOIDED: { label: "Voided", cls: "bg-destructive/15 text-destructive border-destructive/30" },
 };
 
 export function TraBadge({ status }: { status: TraStatus }) {

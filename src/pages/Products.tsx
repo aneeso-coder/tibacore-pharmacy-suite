@@ -99,6 +99,7 @@ export default function Products() {
               <TableHead>Name</TableHead>
               <TableHead>Category</TableHead>
               <TableHead>Pack</TableHead>
+              {showBuyPrices && <TableHead>Supplier</TableHead>}
               <TableHead className="text-right">Sell</TableHead>
               {showBuyPrices && <TableHead className="text-right">Buy (Ref.)</TableHead>}
               <TableHead className="text-right">SOH {isAdmin && branchSel === "ALL" ? "(per branch)" : "(this branch)"}</TableHead>
@@ -110,8 +111,8 @@ export default function Products() {
           <TableBody>
             {filtered.map((p) => {
               const soh = sohFor(p);
-              const total = p.stockMain + p.stockUpanga;
               const low = soh !== null ? soh <= p.reorderPoint : (p.stockMain <= p.reorderPoint || p.stockUpanga <= p.reorderPoint);
+              const supplierName = suppliers.find((s) => s.productIds?.includes(p.id))?.name ?? "—";
               return (
                 <TableRow key={p.id} className="cursor-pointer">
                   <TableCell className="num text-xs text-muted-foreground">{p.barcode}</TableCell>
@@ -122,6 +123,7 @@ export default function Products() {
                   </TableCell>
                   <TableCell className="text-xs">{p.category}</TableCell>
                   <TableCell className="text-xs">{p.packSize}</TableCell>
+                  {showBuyPrices && <TableCell className="text-xs text-muted-foreground">{supplierName}</TableCell>}
                   <TableCell className="text-right num">{fmtTZS(p.sellPrice)}</TableCell>
                   {showBuyPrices && <TableCell className="text-right num text-muted-foreground">{fmtTZS(p.buyPrice)}</TableCell>}
                   <TableCell className="text-right num">

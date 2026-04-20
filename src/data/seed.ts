@@ -1,5 +1,6 @@
 import type {
   Branch, User, Product, Supplier, Customer, Batch, Sale, Prescription, PurchaseOrder, AuditEntry, TaxCode, Invoice, SupplierPayable, SaleLine,
+  InsuranceProvider, InsurancePrice, AdjustmentRecord, Expense,
 } from "./types";
 
 export const ORG = {
@@ -265,3 +266,62 @@ export const supplierPayables: SupplierPayable[] = [
     date: addDays(today, -35).toISOString(), dueDate: addDays(today, 25).toISOString(),
     amount: 800000, paid: 0, status: "OUTSTANDING" },
 ];
+
+export const insuranceProviders: InsuranceProvider[] = [
+  { id: "ins1", name: "NHIF", shortCode: "NHIF", claimEmail: "claims@nhif.or.tz", contactPerson: "Mr. Mwamba", active: true },
+  { id: "ins2", name: "AAR Health", shortCode: "AAR", claimEmail: "claims@aar.co.tz", contactPerson: "Ms. Khalid", active: true },
+  { id: "ins3", name: "Jubilee Allianz", shortCode: "JUBILEE", claimEmail: "claims@jubileetz.com", contactPerson: "Mr. Patel", active: true },
+  { id: "ins4", name: "Strategis Insurance", shortCode: "STRATEGIS", claimEmail: "claims@strategis.co.tz", contactPerson: "Ms. Mollel", active: true },
+];
+
+// 8 products × 4 providers, with NHIF discounted 15-30% from sell price
+const insuredItems = ["p2","p4","p3","p12","p7","p6","p16","p5"]; // Amox, Coartem, Metformin, Folic, ORS, Omeprazole, Azithro, VitC
+export const insurancePrices: InsurancePrice[] = (() => {
+  const out: InsurancePrice[] = [];
+  let n = 1;
+  insuranceProviders.forEach((prov, pi) => {
+    insuredItems.forEach((pid) => {
+      const p = products.find((x) => x.id === pid);
+      if (!p) return;
+      const baseDiscount = prov.shortCode === "NHIF" ? 0.78 : prov.shortCode === "AAR" ? 0.85 : prov.shortCode === "JUBILEE" ? 0.88 : 0.82;
+      const insured = Math.round(p.sellPrice * baseDiscount / 50) * 50;
+      const copay = prov.shortCode === "NHIF" ? 0 : prov.shortCode === "AAR" ? 20 : prov.shortCode === "JUBILEE" ? 15 : 25;
+      out.push({ id: `inp${n++}`, providerId: prov.id, productId: pid, insuredPrice: insured, copayPercent: copay });
+    });
+  });
+  return out;
+})();
+
+export const adjustments: AdjustmentRecord[] = [
+  { id: "adj1", date: addDays(today, -2).toISOString(), productId: "p1", batchId: "b_p1_1", type: "Damaged",
+    qtyChange: -3, sohBefore: 45, sohAfter: 42, notes: "Crushed pack — water damage in storage", authorisedBy: "u2", branchId: "br_main" },
+  { id: "adj2", date: addDays(today, -5).toISOString(), productId: "p14", batchId: "b_p14_1", type: "Damaged",
+    qtyChange: -2, sohBefore: 18, sohAfter: 16, notes: "Tube punctured during transit from supplier", authorisedBy: "u2", branchId: "br_main" },
+  { id: "adj3", date: addDays(today, -7).toISOString(), productId: "p4", batchId: "b_p4_1", type: "Expired",
+    qtyChange: -4, sohBefore: 18, sohAfter: 14, notes: "Past expiry date — disposed via licensed handler", authorisedBy: "u1", branchId: "br_upanga" },
+  { id: "adj4", date: addDays(today, -10).toISOString(), productId: "p7", batchId: "b_p7_1", type: "Stocktake Correction",
+    qtyChange: 5, sohBefore: 60, sohAfter: 65, notes: "Found extra units during quarterly stocktake — system was under-counted", authorisedBy: "u1", branchId: "br_main" },
+  { id: "adj5", date: addDays(today, -12).toISOString(), productId: "p15", batchId: "b_p15_2", type: "Inter-Branch Transfer",
+    qtyChange: -10, sohBefore: 24, sohAfter: 14, notes: "Transferred 10 units to Upanga branch — urgent IV requirement", authorisedBy: "u2", branchId: "br_main" },
+  { id: "adj6", date: addDays(today, -15).toISOString(), productId: "p11", batchId: "b_p11_2", type: "Other",
+    qtyChange: 2, sohBefore: 40, sohAfter: 42, notes: "Returned by customer — unopened pack within return window", authorisedBy: "u2", branchId: "br_main" },
+];
+
+export const expenses: Expense[] = [
+  { id: "ex1", date: addDays(today, -2).toISOString(), category: "Salaries", description: "Pharmacist salary — Apr", amount: 2200000, branchId: "br_main", recordedBy: "u1" },
+  { id: "ex2", date: addDays(today, -2).toISOString(), category: "Salaries", description: "Cashier & support staff — Apr", amount: 1650000, branchId: "br_main", recordedBy: "u1" },
+  { id: "ex3", date: addDays(today, -5).toISOString(), category: "Rent", description: "Monthly rent — Kariakoo store", amount: 1100000, branchId: "br_main", recordedBy: "u1" },
+  { id: "ex4", date: addDays(today, -7).toISOString(), category: "Utilities", description: "Tanesco electricity bill", amount: 245000, branchId: "br_main", recordedBy: "u1" },
+  { id: "ex5", date: addDays(today, -8).toISOString(), category: "Utilities", description: "Water & internet", amount: 175000, branchId: "br_upanga", recordedBy: "u1" },
+  { id: "ex6", date: addDays(today, -12).toISOString(), category: "Supplies", description: "Receipt paper & POS consumables", amount: 145000, branchId: "br_main", recordedBy: "u2" },
+  { id: "ex7", date: addDays(today, -14).toISOString(), category: "Supplies", description: "Cleaning supplies & PPE", amount: 95000, branchId: "br_upanga", recordedBy: "u2" },
+  { id: "ex8", date: addDays(today, -18).toISOString(), category: "Other", description: "Pharmacy Council of TZ — annual fee", amount: 320000, branchId: "br_main", recordedBy: "u1" },
+];
+
+export const systemDefaults = {
+  allowCreditSales: true,
+  allowWalkIn: true,
+  requireCustomerForRx: true,
+  voidRequiresAuth: true,
+  vatDisplayMode: "auto" as "auto" | "full",
+};
