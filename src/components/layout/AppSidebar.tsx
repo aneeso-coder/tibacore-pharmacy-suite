@@ -3,8 +3,8 @@ import { useApp, Permission } from "@/context/AppContext";
 import { Wordmark } from "@/components/brand/Logo";
 import {
   LayoutDashboard, ShoppingCart, Receipt, FileText, Users, Package, Boxes,
-  Layers, ClipboardList, Truck, ShoppingBag, PackageCheck, BarChart3, FileBarChart,
-  Wallet, FileCheck2, ShieldCheck, ScrollText, Settings, Cog, Building2, ChevronDown,
+  Layers, ClipboardList, Truck, ShoppingBag, PackageCheck, BarChart3,
+  ShieldCheck, ScrollText, Settings, Cog, Building2, ChevronDown,
   TrendingUp, TrendingDown,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -39,10 +39,7 @@ const groups: Group[] = [
     { to: "/creditors", label: "Creditors", icon: TrendingDown, perm: "creditors" },
   ]},
   { label: "Reports", perm: "reports", items: [
-    { to: "/reports/sales", label: "Sales Reports", icon: BarChart3 },
-    { to: "/reports/stock", label: "Stock Reports", icon: FileBarChart },
-    { to: "/reports/financial", label: "Financial Reports", icon: Wallet },
-    { to: "/reports/tra", label: "TRA Summary", icon: FileCheck2 },
+    { to: "/reports/sales", label: "Reports", icon: BarChart3 },
   ]},
   { label: "Admin", perm: "users", items: [
     { to: "/admin/users", label: "Users & Roles", icon: ShieldCheck },
@@ -68,6 +65,7 @@ const roleLabels: Record<string, string> = {
 export function AppSidebar() {
   const { user, branch, branches, setBranch, can } = useApp();
   if (!user) return null;
+  const isAdmin = user.branchId === "ALL";
 
   return (
     <aside className="hidden lg:flex w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
@@ -76,29 +74,39 @@ export function AppSidebar() {
       </div>
 
       <div className="px-3 py-3 border-b border-sidebar-border space-y-2">
-        <DropdownMenu>
-          <DropdownMenuTrigger className="w-full flex items-center justify-between gap-2 rounded-md border border-sidebar-border bg-background px-3 py-2 text-sm hover:bg-sidebar-accent transition">
-            <div className="flex items-center gap-2 min-w-0">
-              <Building2 className="h-4 w-4 text-muted-foreground shrink-0" />
-              <div className="text-left min-w-0">
-                <div className="truncate font-medium">{branch.name}</div>
-                <div className="truncate text-[11px] text-muted-foreground">{branch.location}</div>
-              </div>
-            </div>
-            <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-60" align="start">
-            {branches.map((b) => (
-              <DropdownMenuItem key={b.id} onClick={() => setBranch(b)} disabled={user.branchId !== "ALL" && user.branchId !== b.id}>
-                <Building2 className="h-4 w-4 mr-2" />
-                <div className="flex flex-col">
-                  <span className="font-medium text-sm">{b.name}</span>
-                  <span className="text-xs text-muted-foreground">{b.location}</span>
+        {isAdmin ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger className="w-full flex items-center justify-between gap-2 rounded-md border border-sidebar-border bg-background px-3 py-2 text-sm hover:bg-sidebar-accent transition">
+              <div className="flex items-center gap-2 min-w-0">
+                <Building2 className="h-4 w-4 text-muted-foreground shrink-0" />
+                <div className="text-left min-w-0">
+                  <div className="truncate font-medium">{branch.name}</div>
+                  <div className="truncate text-[11px] text-muted-foreground">{branch.location}</div>
                 </div>
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+              </div>
+              <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-60" align="start">
+              {branches.map((b) => (
+                <DropdownMenuItem key={b.id} onClick={() => setBranch(b)}>
+                  <Building2 className="h-4 w-4 mr-2" />
+                  <div className="flex flex-col">
+                    <span className="font-medium text-sm">{b.name}</span>
+                    <span className="text-xs text-muted-foreground">{b.location}</span>
+                  </div>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <div className="w-full flex items-center gap-2 rounded-md border border-sidebar-border bg-background px-3 py-2 text-sm">
+            <Building2 className="h-4 w-4 text-muted-foreground shrink-0" />
+            <div className="text-left min-w-0">
+              <div className="truncate font-medium">{branch.name}</div>
+              <div className="truncate text-[11px] text-muted-foreground">{branch.location}</div>
+            </div>
+          </div>
+        )}
 
         <div className="flex items-center gap-2 px-1">
           <div className="h-8 w-8 rounded-full bg-primary-muted text-primary flex items-center justify-center text-sm font-semibold">
