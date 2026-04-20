@@ -19,7 +19,7 @@ const demos = [
 export default function Login() {
   const { login, user } = useApp();
   const nav = useNavigate();
-  const [email, setEmail] = useState("admin@tibacore.com");
+  const [email, setEmail] = useState("emmanuel.solomon@tibacore.com");
   const [password, setPassword] = useState("admin123");
   const [loading, setLoading] = useState(false);
 
