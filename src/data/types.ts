@@ -45,6 +45,38 @@ export interface Supplier {
   phone: string;
   email: string;
   productIds: string[];
+  tin?: string;
+  address?: string;
+  paymentTerms: "COD" | "30_days" | "60_days" | "on_order";
+  creditLimit: number;
+  outstandingBalance: number;
+  active?: boolean;
+}
+
+export interface Invoice {
+  id: string;
+  invoiceNo: string;
+  customerId?: string;
+  customerName: string;
+  date: string;
+  dueDate: string;
+  amount: number;
+  paid: number;
+  status: "DRAFT" | "SENT" | "PARTIAL" | "PAID" | "OVERDUE";
+  lines: SaleLine[];
+  notes?: string;
+}
+
+export interface SupplierPayable {
+  id: string;
+  supplierId: string;
+  supplierName: string;
+  reference: string;
+  date: string;
+  dueDate: string;
+  amount: number;
+  paid: number;
+  status: "OUTSTANDING" | "OVERDUE" | "PAID";
 }
 
 export interface Customer {
