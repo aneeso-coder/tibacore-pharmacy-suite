@@ -108,6 +108,7 @@ export default function POS() {
   const reset = () => {
     setCart([]); setTendered(""); setCustomer("Walk-in"); setPayment("CASH");
     setReceiptNo(`RC-${String(Date.now()).slice(-5)}`);
+    setRxMode(false); setRxId(null);
   };
 
   const allSameRateA = cart.length > 0 && cart.every((l) => l.taxCode === "A");
@@ -127,6 +128,18 @@ export default function POS() {
           </Button>
         </div>
       </header>
+
+      {rxMode && (
+        <div className="bg-primary/10 border-b border-primary/20 px-4 py-2 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-sm text-primary">
+            <FileText className="h-4 w-4" />
+            <span>Dispensing prescription <span className="font-semibold">{rxId}</span> — Rx items have been pre-loaded into cart.</span>
+          </div>
+          <button onClick={reset} className="text-primary hover:text-primary/70 text-xs font-medium flex items-center gap-1">
+            <X className="h-3.5 w-3.5" /> Clear Rx
+          </button>
+        </div>
+      )}
 
       <div className="flex-1 flex min-h-0">
         {/* Product browse */}
