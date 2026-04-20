@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { Info } from "lucide-react";
 
 const demos = [
-  { role: "Admin", email: "admin@tibacore.com", pw: "admin123" },
+  { role: "Admin", email: "emmanuel.solomon@tibacore.com", pw: "admin123" },
   { role: "Pharmacist", email: "pharmacist@tibacore.com", pw: "pharma123" },
   { role: "Cashier", email: "cashier@tibacore.com", pw: "cash123" },
   { role: "Viewer", email: "viewer@tibacore.com", pw: "view123" },
