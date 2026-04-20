@@ -28,6 +28,8 @@ export default function POS() {
   const [tendered, setTendered] = useState<string>("");
   const [receiptOpen, setReceiptOpen] = useState(false);
   const [lastReceipt, setLastReceipt] = useState<any>(null);
+  const [receiptNo, setReceiptNo] = useState(() => `RC-${String(Date.now()).slice(-5)}`);
+  const [traCode] = useState(() => `RCT${Math.floor(Math.random() * 900000 + 100000)}`);
 
   const stockKey = branch.id === "br_main" ? "stockMain" : "stockUpanga";
 
@@ -65,9 +67,8 @@ export default function POS() {
   const completeSale = () => {
     if (cart.length === 0) return toast.error("Cart is empty");
     if (payment === "CASH" && Number(tendered) < calc.total) return toast.error("Insufficient cash tendered");
-    const receiptNo = `RC-${Math.floor(Math.random() * 90000 + 10000)}`;
     const receipt = {
-      receiptNo, date: new Date(), branch, cashier: user?.name, customer,
+      receiptNo, traCode, date: new Date(), branch, cashier: user?.name, customer,
       lines: cart, ...calc, payment, tendered: Number(tendered), change,
     };
     setLastReceipt(receipt);
@@ -76,7 +77,11 @@ export default function POS() {
 
   const reset = () => {
     setCart([]); setTendered(""); setCustomer("Walk-in"); setPayment("CASH");
+    setReceiptNo(`RC-${String(Date.now()).slice(-5)}`);
   };
+
+  const allSameRateA = cart.length > 0 && cart.every((l) => l.taxCode === "A");
+  const mixedRates = cart.length > 0 && !cart.every((l) => l.taxCode === cart[0].taxCode);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -136,7 +141,7 @@ export default function POS() {
           <div className="p-4 border-b flex items-center justify-between">
             <div>
               <div className="text-xs text-muted-foreground">{new Date().toLocaleDateString()}</div>
-              <div className="font-medium">Receipt RC-{Math.floor(Math.random() * 9000 + 1000)}</div>
+              <div className="font-medium">Receipt {receiptNo}</div>
             </div>
             <Button variant="ghost" size="sm" onClick={reset} disabled={!cart.length}>
               <Trash2 className="h-4 w-4 mr-1" /> Clear
@@ -190,9 +195,14 @@ export default function POS() {
             <div className="space-y-1 text-sm">
               <Row label="Subtotal" value={fmtTZS(calc.subtotal)} />
               {calc.discount > 0 && <Row label="Discount" value={`- ${fmtTZS(calc.discount)}`} muted />}
-              <Row label="VAT A (18%)" value={fmtTZS(calc.vatA)} muted />
-              <Row label="VAT C (0%)" value={fmtTZS(0)} muted />
-              <Row label="VAT E (Exempt)" value="—" muted />
+              {allSameRateA && <Row label="VAT (18%)" value={fmtTZS(calc.vatA)} muted />}
+              {mixedRates && (
+                <>
+                  <Row label="VAT A (18%)" value={fmtTZS(calc.vatA)} muted />
+                  <Row label="VAT C (0%)" value={fmtTZS(0)} muted />
+                  <Row label="VAT E (Exempt)" value="—" muted />
+                </>
+              )}
             </div>
             <div className="flex justify-between items-baseline">
               <div className="text-sm font-medium">Grand Total</div>
@@ -299,7 +309,7 @@ function ReceiptDialog({ open, onClose, receipt }: { open: boolean; onClose: () 
               backgroundImage: "repeating-conic-gradient(hsl(var(--foreground)) 0% 25%, hsl(var(--background)) 25% 50%)",
               backgroundSize: "8px 8px",
             }} />
-            <div className="text-[10px] text-muted-foreground">TRA Verification Code: RCT{Math.floor(Math.random()*900000+100000)}</div>
+            <div className="text-[10px] text-muted-foreground">TRA Verification Code: {receipt.traCode}</div>
           </div>
           <div className="text-center mt-2 text-[10px] text-muted-foreground">Pharmacy. Simplified.</div>
         </div>
