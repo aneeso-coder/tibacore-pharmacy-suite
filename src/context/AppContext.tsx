@@ -27,11 +27,15 @@ export type Permission =
   | "tra_settings"
   | "audit"
   | "system_settings"
-  | "see_prices";
+  | "see_prices"
+  | "debtors"
+  | "creditors"
+  | "invoices"
+  | "adjustments:approve";
 
 const rolePerms: Record<Role, Permission[]> = {
-  super_admin: ["pos","sales:view_all","inventory","purchasing","reports","reports:buy_prices","users","tra_settings","audit","system_settings","see_prices"],
-  pharmacist: ["pos","sales:view_all","inventory","purchasing","reports","see_prices"],
+  super_admin: ["pos","sales:view_all","inventory","purchasing","reports","reports:buy_prices","users","tra_settings","audit","system_settings","see_prices","debtors","creditors","invoices","adjustments:approve"],
+  pharmacist: ["pos","sales:view_all","inventory","purchasing","reports","reports:buy_prices","see_prices","adjustments:approve"],
   cashier: ["pos","sales:view_own","see_prices"],
   viewer: ["reports"],
 };
@@ -90,7 +94,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       },
       login, logout, can,
       showPrices: !!user && user.role !== "viewer",
-      showBuyPrices: !!user && (user.role === "super_admin"),
+      showBuyPrices: !!user && (user.role === "super_admin" || user.role === "pharmacist"),
     };
   }, [user, branch]);
 

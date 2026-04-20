@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { sales, products } from "@/data/seed";
 import { fmtTZS, fmtNum, fmtDate } from "@/lib/format";
 import { useApp } from "@/context/AppContext";
-import { DollarSign, TrendingUp, Package, AlertTriangle } from "lucide-react";
+import { Banknote, TrendingUp, Package, AlertTriangle } from "lucide-react";
 import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, BarChart, Bar,
 } from "recharts";
@@ -58,7 +58,7 @@ export default function Dashboard() {
   return (
     <AppLayout title="Dashboard">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard label="Today's Revenue" value={fmtTZS(todayRev)} icon={<DollarSign className="h-4 w-4" />} hint={`${branch.name}`} />
+        <StatCard label="Today's Revenue" value={fmtTZS(todayRev)} icon={<Banknote className="h-4 w-4" />} hint={`${branch.name}`} />
         <StatCard label="This Month" value={fmtTZS(monthRev)} icon={<TrendingUp className="h-4 w-4" />} tone="success" />
         <StatCard label="Active Products" value={fmtNum(products.length)} icon={<Package className="h-4 w-4" />} />
         <StatCard label="Low Stock Alerts" value={lowStock.length} icon={<AlertTriangle className="h-4 w-4" />} tone={lowStock.length ? "warning" : "default"} />
