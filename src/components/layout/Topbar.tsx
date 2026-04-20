@@ -1,7 +1,7 @@
 import { useApp } from "@/context/AppContext";
 import { useTheme } from "@/context/ThemeContext";
 import { Button } from "@/components/ui/button";
-import { Bell, Moon, Sun, LogOut, Search } from "lucide-react";
+import { Bell, Moon, Sun, LogOut } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
   DropdownMenuSeparator, DropdownMenuTrigger,
@@ -9,8 +9,8 @@ import {
 import { NotificationsPanel } from "./NotificationsPanel";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Input } from "@/components/ui/input";
 import { products, batches, sales } from "@/data/seed";
+import { GlobalSearch } from "./GlobalSearch";
 
 export function Topbar({ title }: { title?: string }) {
   const { user, logout, branch } = useApp();
@@ -38,10 +38,7 @@ export function Topbar({ title }: { title?: string }) {
       <div className="flex h-14 items-center gap-3 px-4 lg:px-6">
         <h1 className="text-base font-semibold tracking-tight truncate">{title}</h1>
         <div className="ml-auto flex items-center gap-2">
-          <div className="relative hidden md:block">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search..." className="h-9 w-56 pl-8 bg-muted/40" />
-          </div>
+          <GlobalSearch />
           <Button variant="ghost" size="icon" onClick={toggle} aria-label="Toggle theme">
             {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
