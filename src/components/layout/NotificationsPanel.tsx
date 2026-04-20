@@ -105,7 +105,7 @@ export function NotificationsPanel({ open, onClose, onMarkAllRead }: { open: boo
 
   const sections = [
     { key: "stock", title: "Stock Alerts", icon: <Bell className="h-4 w-4 text-warning" />, items: filterDismissed(stockAlerts) },
-    { key: "exp", title: "Expiry Alerts", icon: <Clock className="h-4 w-4 text-orange-500" />, items: filterDismissed(expiryAlerts) },
+    { key: "exp", title: "Expiry Alerts", icon: <Clock className="h-4 w-4 text-warning" />, items: filterDismissed(expiryAlerts) },
     { key: "tra", title: "TRA / Compliance", icon: <ShieldAlert className="h-4 w-4 text-destructive" />, items: filterDismissed(traAlerts) },
     { key: "fin", title: "Financial", icon: <Coins className="h-4 w-4 text-info" />, items: filterDismissed(financialAlerts) },
   ];
