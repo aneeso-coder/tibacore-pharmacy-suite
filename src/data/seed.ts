@@ -1,5 +1,6 @@
 import type {
   Branch, User, Product, Supplier, Customer, Batch, Sale, Prescription, PurchaseOrder, AuditEntry, TaxCode, Invoice, SupplierPayable, SaleLine,
+  InsuranceProvider, InsurancePrice, AdjustmentRecord, Expense,
 } from "./types";
 
 export const ORG = {
