@@ -441,6 +441,16 @@ function ReportBody({ kind, range }: { kind: string; range: { from: Date; to: Da
     );
   }
 
+  if (kind === "insurance-claims") return <InsuranceClaimsReport range={range} />;
+  if (kind === "pl") {
+    if (!showBuyPrices) return <Card className="p-8 text-center text-sm text-muted-foreground">You don't have permission to view this report.</Card>;
+    return <PLReport range={range} />;
+  }
+  if (kind === "financial-summary") {
+    if (!showBuyPrices) return <Card className="p-8 text-center text-sm text-muted-foreground">You don't have permission to view this report.</Card>;
+    return <FinancialSummaryReport range={range} />;
+  }
+
   if (kind === "custom") return <CustomReportBuilder range={range} />;
 
   return null;
