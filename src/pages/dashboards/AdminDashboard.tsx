@@ -1,15 +1,15 @@
 import { useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { StatCard } from "@/components/ui-ext/StatCard";
-import { sales, products, batches, invoices } from "@/data/seed";
+import { sales, products, batches, invoices, expenses, insurancePrices } from "@/data/seed";
 import { fmtTZS } from "@/lib/format";
-import { Banknote, TrendingUp, Package, Wallet, AlertTriangle, PackageX, Clock, FileX2 } from "lucide-react";
+import { Banknote, Package, Wallet, AlertTriangle, PackageX, Clock, FileX2, ShieldCheck } from "lucide-react";
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid,
   PieChart, Pie, Cell, Legend,
 } from "recharts";
-import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useApp } from "@/context/AppContext";
 import { cn } from "@/lib/utils";
 
 const PERIOD_OPTS = [
@@ -33,6 +33,7 @@ const PIE_COLORS = ["hsl(var(--primary))", "hsl(var(--info))", "hsl(var(--warnin
 
 export default function AdminDashboard() {
   const nav = useNavigate();
+  const { branch } = useApp();
   const [period, setPeriod] = useState<PKey>("month");
 
   const today = useMemo(() => { const d = new Date(); d.setHours(0,0,0,0); return d; }, []);
@@ -40,7 +41,9 @@ export default function AdminDashboard() {
 
   const revToday = sales.filter((s) => new Date(s.date) >= today).reduce((a,s) => a + s.total, 0);
   const revMonth = sales.filter((s) => new Date(s.date) >= monthStart).reduce((a,s) => a + s.total, 0);
-  const stockValue = products.reduce((a,p) => a + (p.stockMain + p.stockUpanga) * p.buyPrice, 0);
+  // Branch-aware total stock value
+  const stockKey = branch.id === "br_main" ? "stockMain" : "stockUpanga";
+  const stockValue = products.reduce((a,p) => a + (p as any)[stockKey] * p.buyPrice, 0);
 
   // COGS this month
   const cogsMonth = sales
@@ -51,6 +54,17 @@ export default function AdminDashboard() {
     }, 0), 0);
   const grossProfitMonth = revMonth - cogsMonth;
   const grossMargin = revMonth ? (grossProfitMonth / revMonth) * 100 : 0;
+
+  // Operating expenses this month
+  const expensesMonth = expenses
+    .filter((e) => new Date(e.date) >= monthStart)
+    .reduce((a, e) => a + e.amount, 0);
+  const netProfitMonth = grossProfitMonth - expensesMonth;
+
+  // Insurance receivable (mock — sum of insured prices for unpaid claims; here we use 35% of insured prices as outstanding)
+  const insuranceReceivable = useMemo(() => {
+    return Math.round(insurancePrices.reduce((a, ip) => a + ip.insuredPrice * 8, 0) * 0.35);
+  }, []);
 
   // Period selector revenue (interactive on This Month card)
   const periodRev = useMemo(() => {
