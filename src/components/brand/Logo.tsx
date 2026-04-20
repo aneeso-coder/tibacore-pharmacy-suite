@@ -14,13 +14,13 @@ export function Logo({ className, size = 28 }: { className?: string; size?: numb
       <img
         src={logoUrl}
         alt="TibaCore"
-        // The icon sits roughly in the top half of the source image.
-        // Scale up and shift so only the icon is visible inside the box.
+        // Source image: icon occupies roughly the top ~55% of the canvas,
+        // horizontally centered. Scale up & offset so only the icon shows.
         style={{
-          width: size * 2.4,
-          height: size * 2.4,
-          marginLeft: -size * 0.7,
-          marginTop: -size * 0.55,
+          width: size * 2.6,
+          height: size * 2.6,
+          marginLeft: -size * 0.8,
+          marginTop: -size * 0.75,
           objectFit: "contain",
           maxWidth: "none",
         }}
