@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/ui-ext/Page";
 import { Card } from "@/components/ui/card";
@@ -11,10 +11,15 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ORG, branches as seedBranches } from "@/data/seed";
+import { ORG, branches as seedBranches, expenses as seedExpenses, users as seedUsers } from "@/data/seed";
+import { fmtTZS, fmtDate } from "@/lib/format";
 import { toast } from "sonner";
 import { Upload, Plus, Pencil } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useApp } from "@/context/AppContext";
+import type { Expense } from "@/data/types";
+
+const EXPENSE_CATEGORIES = ["Salaries", "Rent", "Utilities", "Supplies", "Marketing", "Maintenance", "Other"] as const;
 
 export default function SystemSettings() {
   const [branchSheet, setBranchSheet] = useState<{ open: boolean; edit?: any }>({ open: false });
