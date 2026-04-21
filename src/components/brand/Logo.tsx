@@ -12,7 +12,9 @@ import logoUrl from "@/assets/tibacore-logo.png";
 export function Logo({ className, size = 28 }: { className?: string; size?: number }) {
   // To show only the icon (~34% of the image width) inside a `size` box,
   // we scale the background so the icon ≈ size, i.e. bg-size ≈ size / 0.34.
-  const bgSize = size / 0.32;
+  // Icon occupies ~26% of source canvas, centered at (50%, 39.5%).
+  // Scale up so the icon ≈ `size`, then position the crop window on it.
+  const bgSize = size / 0.26;
   return (
     <div
       className={cn("inline-block shrink-0 bg-no-repeat", className)}
@@ -21,8 +23,7 @@ export function Logo({ className, size = 28 }: { className?: string; size?: numb
         height: size,
         backgroundImage: `url(${logoUrl})`,
         backgroundSize: `${bgSize}px ${bgSize}px`,
-        // Center horizontally on the icon (x≈50%) and vertically (y≈41%).
-        backgroundPosition: `50% 41%`,
+        backgroundPosition: `50% 39.5%`,
       }}
       role="img"
       aria-label="TibaCore"
