@@ -331,18 +331,13 @@ export default function POS() {
 
             {/* Payment method */}
             <div className="space-y-2">
-              <div className={cn("grid gap-1.5", systemDefaults.allowCreditSales ? "grid-cols-4" : "grid-cols-3")}>
+              <div className="grid gap-1.5 grid-cols-3">
                 {(["CASH", "MOBILE", "CARD"] as const).map((m) => (
                   <Button key={m} type="button" variant={payment === m ? "default" : "outline"} size="sm"
                     onClick={() => { setPayment(m); if (m !== "MOBILE") { setMobileProvider(null); setMobileRef(""); } }}>
                     {m}
                   </Button>
                 ))}
-                {systemDefaults.allowCreditSales && (
-                  <Button type="button" variant={payment === "CREDIT" ? "default" : "outline"} size="sm" onClick={() => setPayment("CREDIT")}>
-                    CREDIT
-                  </Button>
-                )}
               </div>
 
               {payment === "MOBILE" && (
