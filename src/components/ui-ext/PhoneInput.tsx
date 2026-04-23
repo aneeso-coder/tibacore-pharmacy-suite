@@ -43,9 +43,28 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
       <Input
         ref={ref}
         type="tel"
-        inputMode="tel"
+        inputMode="numeric"
+        pattern="[0-9+]*"
+        autoComplete="tel"
         placeholder={placeholder}
         value={value}
+        onKeyDown={(e) => {
+          // Allow control keys
+          if (
+            e.ctrlKey || e.metaKey || e.altKey ||
+            ["Backspace", "Delete", "Tab", "Escape", "Enter", "Home", "End",
+              "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)
+          ) return;
+          // Allow digits always; allow + only as first char
+          if (/^\d$/.test(e.key)) return;
+          if (e.key === "+" && (e.currentTarget.selectionStart ?? 0) === 0 && !e.currentTarget.value.startsWith("+")) return;
+          e.preventDefault();
+        }}
+        onPaste={(e) => {
+          e.preventDefault();
+          const text = e.clipboardData.getData("text");
+          onChange?.(sanitize(text));
+        }}
         onChange={(e) => onChange?.(sanitize(e.target.value))}
         className={cn("num", className)}
         {...props}
