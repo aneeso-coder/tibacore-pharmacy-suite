@@ -116,7 +116,14 @@ export default function POS() {
     return { subtotal, discount, vatByCode, total };
   }, [cart]);
 
-  const change = payment === "CASH" && tendered ? Math.max(0, Number(tendered) - calc.total) : 0;
+  const tenderedNum = Number(tendered.replace(/,/g, "")) || 0;
+  const change = payment === "CASH" && tendered ? tenderedNum - calc.total : 0;
+
+  const handleTenderedChange = (raw: string) => {
+    const digits = raw.replace(/[^\d]/g, "");
+    if (!digits) return setTendered("");
+    setTendered(Number(digits).toLocaleString("en-US"));
+  };
 
   const completeSale = () => {
     if (cart.length === 0) return toast.error("Cart is empty");
