@@ -181,6 +181,7 @@ export default function Users() {
 
 function UserSheet({ open, onClose, user }: { open: boolean; onClose: () => void; user?: any }) {
   const [role, setRole] = useState<string>(user?.role ?? "cashier");
+  const [phone, setPhone] = useState<string>(user?.phone ?? "");
   const [pwd, setPwd] = useState("");
   const [pwd2, setPwd2] = useState("");
   const strength = pwd.length === 0 ? null : pwd.length < 6 ? "short" : pwd.length < 8 ? "weak" : /[a-z]/i.test(pwd) && /\d/.test(pwd) ? "good" : "weak";
