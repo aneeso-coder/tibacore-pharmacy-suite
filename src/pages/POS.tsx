@@ -369,18 +369,33 @@ export default function POS() {
 
               {payment === "CASH" && (
                 <div className="grid grid-cols-2 gap-2 items-center">
-                  <Input placeholder="Tendered" type="number" value={tendered} onChange={(e) => setTendered(e.target.value)} className="h-9 num" />
+                  <Input
+                    placeholder="Tendered"
+                    inputMode="numeric"
+                    value={tendered}
+                    onChange={(e) => handleTenderedChange(e.target.value)}
+                    className="h-10 num text-base"
+                  />
                   <div className="text-sm text-right">
                     <span className="text-muted-foreground">Change </span>
-                    <span className="font-semibold num">{fmtTZS(change)}</span>
+                    <span className={cn("font-semibold num text-base", change < 0 ? "text-destructive" : "text-foreground")}>
+                      {change < 0 ? `- ${fmtTZS(Math.abs(change))}` : fmtTZS(change)}
+                    </span>
                   </div>
                 </div>
               )}
             </div>
 
-            <div className="grid grid-cols-3 gap-2 pt-1">
-              <Button variant="outline" className="border-destructive/50 text-destructive hover:bg-destructive/10" onClick={reset}>Void</Button>
-              <Button className="col-span-2 h-10" onClick={completeSale}>Complete Sale</Button>
+            <div className="pt-1">
+              <Button
+                size="lg"
+                className="w-full h-14 text-base font-semibold shadow-sm hover:shadow-md transition-all"
+                onClick={completeSale}
+                disabled={!cart.length}
+              >
+                <ShoppingCart className="h-5 w-5 mr-2" />
+                Complete Sale • {fmtTZS(calc.total)}
+              </Button>
             </div>
           </div>
         </div>
