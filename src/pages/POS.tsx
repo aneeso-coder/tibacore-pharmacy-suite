@@ -144,7 +144,7 @@ export default function POS() {
       lines: cart, ...calc, payment,
       mobileProvider, mobileRef,
       creditDueDate: payment === "CREDIT" ? creditDueDate : undefined,
-      tendered: Number(tendered), change,
+      tendered: tenderedNum, change: Math.max(0, change),
     };
     setLastReceipt(receipt);
     setReceiptOpen(true);
