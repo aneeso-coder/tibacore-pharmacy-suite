@@ -165,7 +165,7 @@ export default function POS() {
   }, [custQuery, customers]);
 
   const handleQuickAdd = () => {
-    if (!quickName.trim() || !quickPhone.trim()) return toast.error("Name and phone are required");
+    if (!quickName.trim()) return toast.error("Name is required");
     const newCust: Customer = { id: `c_new_${Date.now()}`, name: quickName.trim(), phone: quickPhone.trim() };
     setCustomers((cs) => [newCust, ...cs]);
     setSelectedCustomer(newCust);
