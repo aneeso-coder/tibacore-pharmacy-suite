@@ -98,7 +98,7 @@ export default function Customers() {
           <SheetHeader><SheetTitle>Add Customer</SheetTitle></SheetHeader>
           <div className="space-y-3 mt-5">
             <div><Label>Full Name *</Label><Input className="mt-1.5" /></div>
-            <div><Label>Phone *</Label><Input className="mt-1.5" placeholder="+255..." /></div>
+            <div><Label>Phone</Label><PhoneInput className="mt-1.5" value={newPhone} onChange={setNewPhone} /></div>
             <div><Label>Email</Label><Input className="mt-1.5" type="email" /></div>
             <div>
               <Label>ID Type</Label>
