@@ -127,7 +127,7 @@ export default function POS() {
 
   const completeSale = () => {
     if (cart.length === 0) return toast.error("Cart is empty");
-    if (payment === "CASH" && Number(tendered) < calc.total) return toast.error("Insufficient cash tendered");
+    if (payment === "CASH" && tenderedNum < calc.total) return toast.error("Insufficient cash tendered");
     if (payment === "MOBILE" && !mobileProvider) return toast.error("Select a mobile money provider");
     if (payment === "MOBILE" && !mobileRef.trim()) return toast.error("Enter a reference number");
 
