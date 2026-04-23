@@ -194,7 +194,7 @@ function UserSheet({ open, onClose, user }: { open: boolean; onClose: () => void
         <div className="space-y-3 mt-5">
           <div><Label>Full Name *</Label><Input className="mt-1.5" defaultValue={user?.name ?? ""} /></div>
           <div><Label>Email *</Label><Input className="mt-1.5" type="email" defaultValue={user?.email ?? ""} /></div>
-          <div><Label>Phone Number</Label><Input className="mt-1.5" placeholder="+255..." /></div>
+          <div><Label>Phone Number</Label><PhoneInput className="mt-1.5" value={phone} onChange={setPhone} /></div>
           <div>
             <Label>Role *</Label>
             <Select value={role} onValueChange={setRole}>
