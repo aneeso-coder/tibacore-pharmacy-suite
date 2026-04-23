@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PhoneInput } from "@/components/ui-ext/PhoneInput";
 import { toast } from "sonner";
 
 const roleLabels: any = { super_admin: "Super Admin", pharmacist: "Pharmacist", cashier: "Cashier", viewer: "Viewer" };
@@ -180,6 +181,7 @@ export default function Users() {
 
 function UserSheet({ open, onClose, user }: { open: boolean; onClose: () => void; user?: any }) {
   const [role, setRole] = useState<string>(user?.role ?? "cashier");
+  const [phone, setPhone] = useState<string>(user?.phone ?? "");
   const [pwd, setPwd] = useState("");
   const [pwd2, setPwd2] = useState("");
   const strength = pwd.length === 0 ? null : pwd.length < 6 ? "short" : pwd.length < 8 ? "weak" : /[a-z]/i.test(pwd) && /\d/.test(pwd) ? "good" : "weak";
@@ -192,7 +194,7 @@ function UserSheet({ open, onClose, user }: { open: boolean; onClose: () => void
         <div className="space-y-3 mt-5">
           <div><Label>Full Name *</Label><Input className="mt-1.5" defaultValue={user?.name ?? ""} /></div>
           <div><Label>Email *</Label><Input className="mt-1.5" type="email" defaultValue={user?.email ?? ""} /></div>
-          <div><Label>Phone Number</Label><Input className="mt-1.5" placeholder="+255..." /></div>
+          <div><Label>Phone Number</Label><PhoneInput className="mt-1.5" value={phone} onChange={setPhone} /></div>
           <div>
             <Label>Role *</Label>
             <Select value={role} onValueChange={setRole}>

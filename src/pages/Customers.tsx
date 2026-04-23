@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { PhoneInput } from "@/components/ui-ext/PhoneInput";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { fmtTZS, fmtDate } from "@/lib/format";
 import { Plus, Printer } from "lucide-react";
@@ -18,6 +19,7 @@ export default function Customers() {
   const [q, setQ] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
+  const [newPhone, setNewPhone] = useState("");
   const filtered = customers.filter((c) => c.name.toLowerCase().includes(q.toLowerCase()) || c.phone.includes(q));
   const sel = customers.find((c) => c.id === selected);
   const history = sel ? sales.filter((s) => s.customerId === sel.id).slice(0, 20) : [];
@@ -96,7 +98,7 @@ export default function Customers() {
           <SheetHeader><SheetTitle>Add Customer</SheetTitle></SheetHeader>
           <div className="space-y-3 mt-5">
             <div><Label>Full Name *</Label><Input className="mt-1.5" /></div>
-            <div><Label>Phone *</Label><Input className="mt-1.5" placeholder="+255..." /></div>
+            <div><Label>Phone</Label><PhoneInput className="mt-1.5" value={newPhone} onChange={setNewPhone} /></div>
             <div><Label>Email</Label><Input className="mt-1.5" type="email" /></div>
             <div>
               <Label>ID Type</Label>
@@ -117,7 +119,7 @@ export default function Customers() {
           </div>
           <SheetFooter className="mt-5">
             <Button variant="outline" onClick={() => setAddOpen(false)}>Cancel</Button>
-            <Button onClick={() => { toast.success("Customer added (demo)"); setAddOpen(false); }}>Add Customer</Button>
+            <Button onClick={() => { toast.success("Customer added (demo)"); setNewPhone(""); setAddOpen(false); }}>Add Customer</Button>
           </SheetFooter>
         </SheetContent>
       </Sheet>
