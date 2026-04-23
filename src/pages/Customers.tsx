@@ -119,7 +119,7 @@ export default function Customers() {
           </div>
           <SheetFooter className="mt-5">
             <Button variant="outline" onClick={() => setAddOpen(false)}>Cancel</Button>
-            <Button onClick={() => { toast.success("Customer added (demo)"); setAddOpen(false); }}>Add Customer</Button>
+            <Button onClick={() => { toast.success("Customer added (demo)"); setNewPhone(""); setAddOpen(false); }}>Add Customer</Button>
           </SheetFooter>
         </SheetContent>
       </Sheet>
