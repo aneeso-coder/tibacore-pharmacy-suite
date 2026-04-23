@@ -431,8 +431,8 @@ export default function POS() {
               <Input value={quickName} onChange={(e) => setQuickName(e.target.value)} autoFocus />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-sm">Phone *</Label>
-              <Input value={quickPhone} onChange={(e) => setQuickPhone(e.target.value)} placeholder="+255..." />
+              <Label className="text-sm">Phone</Label>
+              <PhoneInput value={quickPhone} onChange={setQuickPhone} />
             </div>
           </div>
           <DialogFooter>
