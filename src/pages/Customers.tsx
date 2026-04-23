@@ -19,6 +19,7 @@ export default function Customers() {
   const [q, setQ] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
+  const [newPhone, setNewPhone] = useState("");
   const filtered = customers.filter((c) => c.name.toLowerCase().includes(q.toLowerCase()) || c.phone.includes(q));
   const sel = customers.find((c) => c.id === selected);
   const history = sel ? sales.filter((s) => s.customerId === sel.id).slice(0, 20) : [];
