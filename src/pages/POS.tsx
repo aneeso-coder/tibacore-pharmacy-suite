@@ -116,11 +116,18 @@ export default function POS() {
     return { subtotal, discount, vatByCode, total };
   }, [cart]);
 
-  const change = payment === "CASH" && tendered ? Math.max(0, Number(tendered) - calc.total) : 0;
+  const tenderedNum = Number(tendered.replace(/,/g, "")) || 0;
+  const change = payment === "CASH" && tendered ? tenderedNum - calc.total : 0;
+
+  const handleTenderedChange = (raw: string) => {
+    const digits = raw.replace(/[^\d]/g, "");
+    if (!digits) return setTendered("");
+    setTendered(Number(digits).toLocaleString("en-US"));
+  };
 
   const completeSale = () => {
     if (cart.length === 0) return toast.error("Cart is empty");
-    if (payment === "CASH" && Number(tendered) < calc.total) return toast.error("Insufficient cash tendered");
+    if (payment === "CASH" && tenderedNum < calc.total) return toast.error("Insufficient cash tendered");
     if (payment === "MOBILE" && !mobileProvider) return toast.error("Select a mobile money provider");
     if (payment === "MOBILE" && !mobileRef.trim()) return toast.error("Enter a reference number");
 
@@ -137,7 +144,7 @@ export default function POS() {
       lines: cart, ...calc, payment,
       mobileProvider, mobileRef,
       creditDueDate: payment === "CREDIT" ? creditDueDate : undefined,
-      tendered: Number(tendered), change,
+      tendered: tenderedNum, change: Math.max(0, change),
     };
     setLastReceipt(receipt);
     setReceiptOpen(true);
@@ -362,18 +369,33 @@ export default function POS() {
 
               {payment === "CASH" && (
                 <div className="grid grid-cols-2 gap-2 items-center">
-                  <Input placeholder="Tendered" type="number" value={tendered} onChange={(e) => setTendered(e.target.value)} className="h-9 num" />
+                  <Input
+                    placeholder="Tendered"
+                    inputMode="numeric"
+                    value={tendered}
+                    onChange={(e) => handleTenderedChange(e.target.value)}
+                    className="h-10 num text-base"
+                  />
                   <div className="text-sm text-right">
                     <span className="text-muted-foreground">Change </span>
-                    <span className="font-semibold num">{fmtTZS(change)}</span>
+                    <span className={cn("font-semibold num text-base", change < 0 ? "text-destructive" : "text-foreground")}>
+                      {change < 0 ? `- ${fmtTZS(Math.abs(change))}` : fmtTZS(change)}
+                    </span>
                   </div>
                 </div>
               )}
             </div>
 
-            <div className="grid grid-cols-3 gap-2 pt-1">
-              <Button variant="outline" className="border-destructive/50 text-destructive hover:bg-destructive/10" onClick={reset}>Void</Button>
-              <Button className="col-span-2 h-10" onClick={completeSale}>Complete Sale</Button>
+            <div className="pt-1">
+              <Button
+                size="lg"
+                className="w-full h-14 text-base font-semibold shadow-sm hover:shadow-md transition-all"
+                onClick={completeSale}
+                disabled={!cart.length}
+              >
+                <ShoppingCart className="h-5 w-5 mr-2" />
+                Complete Sale • {fmtTZS(calc.total)}
+              </Button>
             </div>
           </div>
         </div>
