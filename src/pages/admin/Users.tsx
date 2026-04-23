@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PhoneInput } from "@/components/ui-ext/PhoneInput";
 import { toast } from "sonner";
 
 const roleLabels: any = { super_admin: "Super Admin", pharmacist: "Pharmacist", cashier: "Cashier", viewer: "Viewer" };
