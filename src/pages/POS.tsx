@@ -17,6 +17,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { PhoneInput } from "@/components/ui-ext/PhoneInput";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -164,7 +165,7 @@ export default function POS() {
   }, [custQuery, customers]);
 
   const handleQuickAdd = () => {
-    if (!quickName.trim() || !quickPhone.trim()) return toast.error("Name and phone are required");
+    if (!quickName.trim()) return toast.error("Name is required");
     const newCust: Customer = { id: `c_new_${Date.now()}`, name: quickName.trim(), phone: quickPhone.trim() };
     setCustomers((cs) => [newCust, ...cs]);
     setSelectedCustomer(newCust);
@@ -430,8 +431,8 @@ export default function POS() {
               <Input value={quickName} onChange={(e) => setQuickName(e.target.value)} autoFocus />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-sm">Phone *</Label>
-              <Input value={quickPhone} onChange={(e) => setQuickPhone(e.target.value)} placeholder="+255..." />
+              <Label className="text-sm">Phone</Label>
+              <PhoneInput value={quickPhone} onChange={setQuickPhone} />
             </div>
           </div>
           <DialogFooter>
