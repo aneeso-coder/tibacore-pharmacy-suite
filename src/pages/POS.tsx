@@ -369,6 +369,7 @@ export default function POS() {
                     inputMode="numeric"
                     value={tendered}
                     onChange={(e) => handleTenderedChange(e.target.value)}
+                    disabled={cart.length === 0}
                     className="h-10 num text-base"
                   />
                   <div className="text-sm text-right">
