@@ -8,9 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { PhoneInput } from "@/components/ui-ext/PhoneInput";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { fmtTZS, fmtDate } from "@/lib/format";
 import { Plus, Printer } from "lucide-react";
 import { toast } from "sonner";
@@ -100,22 +98,6 @@ export default function Customers() {
             <div><Label>Full Name *</Label><Input className="mt-1.5" /></div>
             <div><Label>Phone</Label><PhoneInput className="mt-1.5" value={newPhone} onChange={setNewPhone} /></div>
             <div><Label>Email</Label><Input className="mt-1.5" type="email" /></div>
-            <div>
-              <Label>ID Type</Label>
-              <Select defaultValue="none">
-                <SelectTrigger className="mt-1.5"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">None</SelectItem>
-                  <SelectItem value="tin">TIN</SelectItem>
-                  <SelectItem value="dl">Driving Licence</SelectItem>
-                  <SelectItem value="passport">Passport</SelectItem>
-                  <SelectItem value="nid">National ID</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div><Label>ID Number</Label><Input className="mt-1.5" /></div>
-            <div><Label>Date of Birth</Label><Input className="mt-1.5" type="date" /></div>
-            <div><Label>Allergies / Notes</Label><Textarea className="mt-1.5" rows={3} /></div>
           </div>
           <SheetFooter className="mt-5">
             <Button variant="outline" onClick={() => setAddOpen(false)}>Cancel</Button>
