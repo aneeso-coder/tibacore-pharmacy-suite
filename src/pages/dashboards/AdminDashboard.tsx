@@ -120,10 +120,15 @@ export default function AdminDashboard() {
   const traPending = sales.filter((s) => s.traStatus === "PENDING" || s.traStatus === "FAILED").length;
   const overdueInv = invoices.filter((i) => i.status === "OVERDUE").length;
 
+  const showInsurance = insuranceReceivable > 0;
+  const kpiGridCols = showInsurance
+    ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+    : "grid-cols-1 sm:grid-cols-3";
+
   return (
     <>
       {/* Row 1 — KPIs (clickable financial cards) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className={cn("grid gap-4 mb-6", kpiGridCols)}>
         <button onClick={() => nav("/reports/financial-summary")} className="text-left">
           <Card className="p-5 hover:border-primary transition cursor-pointer h-full">
             <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
@@ -155,15 +160,17 @@ export default function AdminDashboard() {
             <div className="text-[11px] text-muted-foreground mt-1">{grossMargin.toFixed(1)}% margin</div>
           </Card>
         </button>
-        <button onClick={() => nav("/reports/insurance-claims")} className="text-left">
-          <Card className="p-5 hover:border-primary transition cursor-pointer h-full">
-            <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              <ShieldCheck className="h-4 w-4" /> Insurance Receivable
-            </div>
-            <div className="text-2xl font-semibold mt-1 num truncate">{fmtTZS(insuranceReceivable)}</div>
-            <div className="text-[11px] text-muted-foreground mt-1">unpaid claims outstanding</div>
-          </Card>
-        </button>
+        {showInsurance && (
+          <button onClick={() => nav("/reports/insurance-claims")} className="text-left">
+            <Card className="p-5 hover:border-primary transition cursor-pointer h-full">
+              <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                <ShieldCheck className="h-4 w-4" /> Insurance Receivable
+              </div>
+              <div className="text-2xl font-semibold mt-1 num truncate">{fmtTZS(insuranceReceivable)}</div>
+              <div className="text-[11px] text-muted-foreground mt-1">unpaid claims outstanding</div>
+            </Card>
+          </button>
+        )}
       </div>
       <div className="hidden">
         <StatCard label="Revenue Today" value={fmtTZS(revToday)} icon={<Banknote className="h-4 w-4" />} />
