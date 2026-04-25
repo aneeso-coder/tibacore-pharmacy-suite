@@ -216,13 +216,13 @@ export default function POS() {
                 return (
                   <button key={p.id} disabled={oos} onClick={() => addToCart(p)}
                     className={cn("text-left rounded-lg border p-3 hover:border-primary hover:shadow-sm transition bg-card disabled:opacity-50 disabled:cursor-not-allowed")}>
-                    <div className="flex justify-between items-start gap-2 mb-2">
-                      <div className="text-xs text-muted-foreground">{p.packSize}</div>
-                      <Badge variant="outline" className={cn("text-[10px] h-4 px-1.5", oos ? "border-destructive/30 text-destructive" : qty <= p.reorderPoint ? "border-warning/30 text-warning" : "border-success/30 text-success")}>
-                        {qty} in stock
+                    <div className="flex justify-end items-start gap-2 mb-2 min-h-[1rem]">
+                      <Badge variant="outline" className={cn("text-[10px] h-4 px-1.5 font-medium", oos ? "border-destructive/30 text-destructive" : qty <= p.reorderPoint ? "border-warning/30 text-warning" : "border-success/30 text-success")}>
+                        {oos ? "Out of stock" : `${qty} in stock`}
                       </Badge>
                     </div>
                     <div className="text-sm font-medium leading-snug line-clamp-2 min-h-[2.5rem]">{p.name}</div>
+                    <div className="text-[11px] text-muted-foreground mt-0.5">Pack {p.packSize}</div>
                     <div className="mt-2 text-base font-semibold num text-primary">{fmtTZS(p.sellPrice)}</div>
                   </button>
                 );
