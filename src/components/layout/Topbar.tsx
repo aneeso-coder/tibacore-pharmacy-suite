@@ -74,10 +74,22 @@ export function Topbar({ title }: { title?: string }) {
                 <span className="hidden md:inline text-sm">{user?.name.split(" ")[0]}</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-52">
-              <DropdownMenuLabel>
-                <div className="text-sm font-medium">{user?.name}</div>
-                <div className="text-xs text-muted-foreground">{user?.email}</div>
+            <DropdownMenuContent align="end" className="w-64">
+              <DropdownMenuLabel className="py-3">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-primary-muted text-primary flex items-center justify-center text-sm font-semibold shrink-0">
+                    {user?.name.split(" ").map((n) => n[0]).slice(0,2).join("")}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-medium truncate">{user?.name}</div>
+                    <div className="text-xs text-muted-foreground truncate font-normal">{user?.email}</div>
+                  </div>
+                </div>
+                {user && (
+                  <Badge className={cn("mt-2.5 text-[10px] h-4 px-1.5 font-medium border-0", roleColors[user.role])}>
+                    {roleLabels[user.role]}
+                  </Badge>
+                )}
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => { logout(); nav("/login"); }}>
