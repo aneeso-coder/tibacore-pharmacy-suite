@@ -1,6 +1,7 @@
 import { useApp } from "@/context/AppContext";
 import { useTheme } from "@/context/ThemeContext";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Bell, Moon, Sun, LogOut } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
@@ -11,6 +12,20 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { products, batches, sales } from "@/data/seed";
 import { GlobalSearch } from "./GlobalSearch";
+import { cn } from "@/lib/utils";
+
+const roleColors: Record<string, string> = {
+  super_admin: "bg-primary text-primary-foreground",
+  pharmacist: "bg-info text-info-foreground",
+  cashier: "bg-warning text-warning-foreground",
+  viewer: "bg-muted text-muted-foreground",
+};
+const roleLabels: Record<string, string> = {
+  super_admin: "Super Admin",
+  pharmacist: "Pharmacist",
+  cashier: "Cashier",
+  viewer: "Viewer",
+};
 
 export function Topbar({ title }: { title?: string }) {
   const { user, logout, branch } = useApp();
