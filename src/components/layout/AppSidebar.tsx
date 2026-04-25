@@ -47,19 +47,6 @@ const groups: Group[] = [
   ]},
 ];
 
-const roleColors: Record<string, string> = {
-  super_admin: "bg-primary text-primary-foreground",
-  pharmacist: "bg-info text-info-foreground",
-  cashier: "bg-warning text-warning-foreground",
-  viewer: "bg-muted text-muted-foreground",
-};
-const roleLabels: Record<string, string> = {
-  super_admin: "Super Admin",
-  pharmacist: "Pharmacist",
-  cashier: "Cashier",
-  viewer: "Viewer",
-};
-
 export function AppSidebar() {
   const { user, branch, branches, setBranch, can } = useApp();
   if (!user) return null;
