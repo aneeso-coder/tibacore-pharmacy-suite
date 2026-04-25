@@ -73,7 +73,15 @@ export default function StockLevels() {
             <TableRow>
               <TableHead>Product</TableHead>
               <TableHead>Pack</TableHead>
-              <TableHead className="text-right">SOH {activeBranchId === "ALL" ? "(per branch)" : `(${activeBranchName})`}</TableHead>
+              {activeBranchId === "ALL" ? (
+                <>
+                  <TableHead className="text-right">Main</TableHead>
+                  <TableHead className="text-right">Upanga</TableHead>
+                  <TableHead className="text-right">Total</TableHead>
+                </>
+              ) : (
+                <TableHead className="text-right">SOH ({activeBranchName})</TableHead>
+              )}
               <TableHead className="text-right">Reorder Pt.</TableHead>
               <TableHead>Status</TableHead>
             </TableRow>
@@ -87,14 +95,15 @@ export default function StockLevels() {
                 <TableRow key={p.id}>
                   <TableCell className="font-medium">{p.name}</TableCell>
                   <TableCell className="text-xs">{p.packSize}</TableCell>
-                  <TableCell className="text-right num font-medium">
-                    {activeBranchId === "ALL" ? (
-                      <span className="flex flex-col items-end leading-tight text-xs">
-                        <span>Main: <span className="font-medium">{p.stockMain}</span></span>
-                        <span>Upanga: <span className="font-medium">{p.stockUpanga}</span></span>
-                      </span>
-                    ) : soh}
-                  </TableCell>
+                  {activeBranchId === "ALL" ? (
+                    <>
+                      <TableCell className="text-right num">{p.stockMain}</TableCell>
+                      <TableCell className="text-right num">{p.stockUpanga}</TableCell>
+                      <TableCell className="text-right num font-medium">{p.stockMain + p.stockUpanga}</TableCell>
+                    </>
+                  ) : (
+                    <TableCell className="text-right num font-medium">{soh}</TableCell>
+                  )}
                   <TableCell className="text-right num text-muted-foreground">{p.reorderPoint}</TableCell>
                   <TableCell>
                     {isOut ? <Badge variant="outline" className="text-destructive border-destructive/30">Out of Stock</Badge>
