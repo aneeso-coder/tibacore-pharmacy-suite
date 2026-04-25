@@ -5,7 +5,7 @@ import {
   LayoutDashboard, ShoppingCart, Receipt, FileText, Users, Package, Boxes,
   Layers, ClipboardList, Truck, ShoppingBag, PackageCheck, BarChart3,
   ShieldCheck, ScrollText, Settings, Cog, Building2, ChevronDown,
-  TrendingUp, TrendingDown,
+  TrendingUp, TrendingDown, Eye,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
@@ -15,7 +15,10 @@ interface Item { to: string; label: string; icon: any; perm?: Permission }
 interface Group { label: string; items: Item[]; perm?: Permission }
 
 const groups: Group[] = [
-  { label: "Main", items: [{ to: "/", label: "Dashboard", icon: LayoutDashboard }] },
+  { label: "Main", items: [
+    { to: "/", label: "Dashboard", icon: LayoutDashboard },
+    { to: "/receipt-preview", label: "Receipt Preview (temp)", icon: Eye },
+  ] },
   { label: "Operations", items: [
     { to: "/pos", label: "Point of Sale", icon: ShoppingCart, perm: "pos" },
     { to: "/sales", label: "Sales History", icon: Receipt },
