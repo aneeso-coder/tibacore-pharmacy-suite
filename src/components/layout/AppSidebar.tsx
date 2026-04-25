@@ -7,8 +7,6 @@ import {
   ShieldCheck, ScrollText, Settings, Cog, Building2, ChevronDown,
   TrendingUp, TrendingDown,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -49,19 +47,6 @@ const groups: Group[] = [
   ]},
 ];
 
-const roleColors: Record<string, string> = {
-  super_admin: "bg-primary text-primary-foreground",
-  pharmacist: "bg-info text-info-foreground",
-  cashier: "bg-warning text-warning-foreground",
-  viewer: "bg-muted text-muted-foreground",
-};
-const roleLabels: Record<string, string> = {
-  super_admin: "Super Admin",
-  pharmacist: "Pharmacist",
-  cashier: "Cashier",
-  viewer: "Viewer",
-};
-
 export function AppSidebar() {
   const { user, branch, branches, setBranch, can } = useApp();
   if (!user) return null;
@@ -73,7 +58,7 @@ export function AppSidebar() {
         <Wordmark />
       </div>
 
-      <div className="px-3 py-3 border-b border-sidebar-border space-y-2">
+      <div className="px-3 py-3 border-b border-sidebar-border">
         {isAdmin ? (
           <DropdownMenu>
             <DropdownMenuTrigger className="w-full flex items-center justify-between gap-2 rounded-md border border-sidebar-border bg-background px-3 py-2 text-sm hover:bg-sidebar-accent transition">
@@ -107,18 +92,6 @@ export function AppSidebar() {
             </div>
           </div>
         )}
-
-        <div className="flex items-center gap-2 px-1">
-          <div className="h-8 w-8 rounded-full bg-primary-muted text-primary flex items-center justify-center text-sm font-semibold">
-            {user.name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="text-sm font-medium truncate">{user.name}</div>
-            <Badge className={cn("text-[10px] h-4 px-1.5 font-medium border-0", roleColors[user.role])}>
-              {roleLabels[user.role]}
-            </Badge>
-          </div>
-        </div>
       </div>
 
       <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-4">
