@@ -73,7 +73,7 @@ export function AppSidebar() {
         <Wordmark />
       </div>
 
-      <div className="px-3 py-3 border-b border-sidebar-border space-y-2">
+      <div className="px-3 py-3 border-b border-sidebar-border">
         {isAdmin ? (
           <DropdownMenu>
             <DropdownMenuTrigger className="w-full flex items-center justify-between gap-2 rounded-md border border-sidebar-border bg-background px-3 py-2 text-sm hover:bg-sidebar-accent transition">
@@ -107,18 +107,6 @@ export function AppSidebar() {
             </div>
           </div>
         )}
-
-        <div className="flex items-center gap-2 px-1">
-          <div className="h-8 w-8 rounded-full bg-primary-muted text-primary flex items-center justify-center text-sm font-semibold">
-            {user.name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="text-sm font-medium truncate">{user.name}</div>
-            <Badge className={cn("text-[10px] h-4 px-1.5 font-medium border-0", roleColors[user.role])}>
-              {roleLabels[user.role]}
-            </Badge>
-          </div>
-        </div>
       </div>
 
       <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-4">
