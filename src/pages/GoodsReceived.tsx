@@ -131,7 +131,70 @@ export default function GoodsReceived() {
         </Table>
       </Card>
 
-      <NewGrnSheet open={sheetOpen} onOpenChange={setSheetOpen} autoPoId={autoPo} onConfirm={onConfirm} />
+      {/* PO picker — opens before launching the GRN wizard */}
+      <Dialog open={pickerOpen} onOpenChange={setPickerOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Start New GRN</DialogTitle>
+            <DialogDescription>
+              Select the Purchase Order being received. The GRN wizard will open prefilled with its line items.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3 py-2">
+            <div className="space-y-1.5">
+              <Label>Purchase Order *</Label>
+              <Select value={pickerPoId} onValueChange={setPickerPoId}>
+                <SelectTrigger>
+                  <SelectValue placeholder={eligible.length ? "Choose a PO..." : "No open POs available"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {eligible.map((p) => {
+                    const s = suppliers.find((x) => x.id === p.supplierId);
+                    const totalQty = p.lines.reduce((a, l) => a + l.qty, 0);
+                    const totalRcv = p.lines.reduce((a, l) => a + l.received, 0);
+                    return (
+                      <SelectItem key={p.id} value={p.id}>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{p.poNo}</span>
+                          <span className="text-muted-foreground">— {s?.name}</span>
+                          <Badge variant={p.status === "PARTIAL" ? "secondary" : "outline"} className="text-[10px]">
+                            {p.status === "PARTIAL" ? `${totalRcv}/${totalQty} received` : "Awaiting delivery"}
+                          </Badge>
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {pickedPo && (
+              <div className="grid grid-cols-3 gap-3 p-3 rounded-md bg-muted/40 border text-sm">
+                <div>
+                  <div className="text-[11px] text-muted-foreground uppercase">Supplier</div>
+                  <div className="font-medium truncate">{pickedSup?.name}</div>
+                </div>
+                <div>
+                  <div className="text-[11px] text-muted-foreground uppercase">Branch</div>
+                  <div className="font-medium truncate">{pickedBranch?.name}</div>
+                </div>
+                <div>
+                  <div className="text-[11px] text-muted-foreground uppercase">PO Total</div>
+                  <div className="font-medium num">{fmtTZS(pickedPo.total)}</div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPickerOpen(false)}>Cancel</Button>
+            <Button onClick={continueToWizard} disabled={!pickerPoId}>
+              Continue <ArrowRight className="h-4 w-4 ml-1.5" />
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={!!viewGrn} onOpenChange={(o) => !o && setViewGrn(null)}>
         <DialogContent className="max-w-2xl">
