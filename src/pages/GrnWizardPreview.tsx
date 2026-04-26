@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/ui-ext/Page";
 import { Card } from "@/components/ui/card";
@@ -42,11 +43,13 @@ const STEPS = [
 
 export default function GrnWizardPreview() {
   const { user } = useApp();
-  const [step, setStep] = useState(1);
-
+  const [searchParams] = useSearchParams();
+  const queryPoId = searchParams.get("poId") || "";
   // Step 1
   const eligible = purchaseOrders.filter((p) => p.status === "SENT" || p.status === "PARTIAL");
-  const [poId, setPoId] = useState<string>(eligible[0]?.id || "");
+  // If a PO is preselected via URL, jump straight to step 2
+  const [step, setStep] = useState(queryPoId ? 2 : 1);
+  const [poId, setPoId] = useState<string>(queryPoId || eligible[0]?.id || "");
   const [grnNo] = useState(`GRN-${Date.now().toString().slice(-5)}`);
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [deliveryNote, setDeliveryNote] = useState("");

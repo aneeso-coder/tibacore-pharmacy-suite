@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/ui-ext/Page";
 import { Card } from "@/components/ui/card";
@@ -10,11 +10,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import { purchaseOrders, suppliers, products, branches } from "@/data/seed";
 import { useApp } from "@/context/AppContext";
 import { fmtTZS, fmtDate } from "@/lib/format";
-import { Plus, PackageCheck } from "lucide-react";
+import { Plus, PackageCheck, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 
 interface GrnLine { productId: string; qtyOrdered: number; qtyReceived: number; batchNo: string; expiry: string; unitCost: number; }
@@ -53,31 +54,48 @@ const initialGrns: Grn[] = [
 
 export default function GoodsReceived() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [grns, setGrns] = useState<Grn[]>(initialGrns);
-  const [sheetOpen, setSheetOpen] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickerPoId, setPickerPoId] = useState<string>("");
   const [viewGrn, setViewGrn] = useState<Grn | null>(null);
-  const [autoPo, setAutoPo] = useState<string | null>(null);
 
+  const eligible = useMemo(
+    () => purchaseOrders.filter((p) => p.status === "SENT" || p.status === "PARTIAL"),
+    [],
+  );
+
+  // If a PO is passed from the PO page (Receive shortcut), skip the picker
+  // and go straight into the wizard.
   useEffect(() => {
     const state: any = location.state;
     if (state?.poId) {
-      setAutoPo(state.poId);
-      setSheetOpen(true);
       window.history.replaceState({}, "");
+      navigate(`/grn-wizard-preview?poId=${state.poId}`);
     }
-  }, [location.state]);
+  }, [location.state, navigate]);
 
-  const onConfirm = (g: Grn) => {
-    setGrns((prev) => [g, ...prev]);
-    toast.success("GRN confirmed — stock levels updated (demo)");
-    setSheetOpen(false);
-    setAutoPo(null);
+  const openPicker = () => {
+    setPickerPoId(eligible[0]?.id || "");
+    setPickerOpen(true);
   };
+
+  const continueToWizard = () => {
+    if (!pickerPoId) {
+      return;
+    }
+    setPickerOpen(false);
+    navigate(`/grn-wizard-preview?poId=${pickerPoId}`);
+  };
+
+  const pickedPo = purchaseOrders.find((p) => p.id === pickerPoId);
+  const pickedSup = suppliers.find((s) => s.id === pickedPo?.supplierId);
+  const pickedBranch = branches.find((b) => b.id === pickedPo?.branchId);
 
   return (
     <AppLayout title="Goods Received">
       <PageHeader title="Goods Received Notes" description={`${grns.length} GRNs on file`} actions={
-        <Button onClick={() => { setAutoPo(null); setSheetOpen(true); }}><Plus className="h-4 w-4 mr-1.5" /> New GRN</Button>
+        <Button onClick={openPicker}><Plus className="h-4 w-4 mr-1.5" /> New GRN</Button>
       } />
 
       <Card className="overflow-hidden">
@@ -113,7 +131,70 @@ export default function GoodsReceived() {
         </Table>
       </Card>
 
-      <NewGrnSheet open={sheetOpen} onOpenChange={setSheetOpen} autoPoId={autoPo} onConfirm={onConfirm} />
+      {/* PO picker — opens before launching the GRN wizard */}
+      <Dialog open={pickerOpen} onOpenChange={setPickerOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Start New GRN</DialogTitle>
+            <DialogDescription>
+              Select the Purchase Order being received. The GRN wizard will open prefilled with its line items.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3 py-2">
+            <div className="space-y-1.5">
+              <Label>Purchase Order *</Label>
+              <Select value={pickerPoId} onValueChange={setPickerPoId}>
+                <SelectTrigger>
+                  <SelectValue placeholder={eligible.length ? "Choose a PO..." : "No open POs available"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {eligible.map((p) => {
+                    const s = suppliers.find((x) => x.id === p.supplierId);
+                    const totalQty = p.lines.reduce((a, l) => a + l.qty, 0);
+                    const totalRcv = p.lines.reduce((a, l) => a + l.received, 0);
+                    return (
+                      <SelectItem key={p.id} value={p.id}>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{p.poNo}</span>
+                          <span className="text-muted-foreground">— {s?.name}</span>
+                          <Badge variant={p.status === "PARTIAL" ? "secondary" : "outline"} className="text-[10px]">
+                            {p.status === "PARTIAL" ? `${totalRcv}/${totalQty} received` : "Awaiting delivery"}
+                          </Badge>
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {pickedPo && (
+              <div className="grid grid-cols-3 gap-3 p-3 rounded-md bg-muted/40 border text-sm">
+                <div>
+                  <div className="text-[11px] text-muted-foreground uppercase">Supplier</div>
+                  <div className="font-medium truncate">{pickedSup?.name}</div>
+                </div>
+                <div>
+                  <div className="text-[11px] text-muted-foreground uppercase">Branch</div>
+                  <div className="font-medium truncate">{pickedBranch?.name}</div>
+                </div>
+                <div>
+                  <div className="text-[11px] text-muted-foreground uppercase">PO Total</div>
+                  <div className="font-medium num">{fmtTZS(pickedPo.total)}</div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPickerOpen(false)}>Cancel</Button>
+            <Button onClick={continueToWizard} disabled={!pickerPoId}>
+              Continue <ArrowRight className="h-4 w-4 ml-1.5" />
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={!!viewGrn} onOpenChange={(o) => !o && setViewGrn(null)}>
         <DialogContent className="max-w-2xl">
