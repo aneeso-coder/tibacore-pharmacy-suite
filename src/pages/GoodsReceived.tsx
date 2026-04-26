@@ -95,7 +95,7 @@ export default function GoodsReceived() {
   return (
     <AppLayout title="Goods Received">
       <PageHeader title="Goods Received Notes" description={`${grns.length} GRNs on file`} actions={
-        <Button onClick={() => { setAutoPo(null); setSheetOpen(true); }}><Plus className="h-4 w-4 mr-1.5" /> New GRN</Button>
+        <Button onClick={openPicker}><Plus className="h-4 w-4 mr-1.5" /> New GRN</Button>
       } />
 
       <Card className="overflow-hidden">
