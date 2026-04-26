@@ -54,26 +54,43 @@ const initialGrns: Grn[] = [
 
 export default function GoodsReceived() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [grns, setGrns] = useState<Grn[]>(initialGrns);
-  const [sheetOpen, setSheetOpen] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickerPoId, setPickerPoId] = useState<string>("");
   const [viewGrn, setViewGrn] = useState<Grn | null>(null);
-  const [autoPo, setAutoPo] = useState<string | null>(null);
 
+  const eligible = useMemo(
+    () => purchaseOrders.filter((p) => p.status === "SENT" || p.status === "PARTIAL"),
+    [],
+  );
+
+  // If a PO is passed from the PO page (Receive shortcut), skip the picker
+  // and go straight into the wizard.
   useEffect(() => {
     const state: any = location.state;
     if (state?.poId) {
-      setAutoPo(state.poId);
-      setSheetOpen(true);
       window.history.replaceState({}, "");
+      navigate(`/grn-wizard-preview?poId=${state.poId}`);
     }
-  }, [location.state]);
+  }, [location.state, navigate]);
 
-  const onConfirm = (g: Grn) => {
-    setGrns((prev) => [g, ...prev]);
-    toast.success("GRN confirmed — stock levels updated (demo)");
-    setSheetOpen(false);
-    setAutoPo(null);
+  const openPicker = () => {
+    setPickerPoId(eligible[0]?.id || "");
+    setPickerOpen(true);
   };
+
+  const continueToWizard = () => {
+    if (!pickerPoId) {
+      return;
+    }
+    setPickerOpen(false);
+    navigate(`/grn-wizard-preview?poId=${pickerPoId}`);
+  };
+
+  const pickedPo = purchaseOrders.find((p) => p.id === pickerPoId);
+  const pickedSup = suppliers.find((s) => s.id === pickedPo?.supplierId);
+  const pickedBranch = branches.find((b) => b.id === pickedPo?.branchId);
 
   return (
     <AppLayout title="Goods Received">
