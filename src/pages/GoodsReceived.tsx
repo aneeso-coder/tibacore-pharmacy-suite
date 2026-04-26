@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/ui-ext/Page";
 import { Card } from "@/components/ui/card";
@@ -10,11 +10,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import { purchaseOrders, suppliers, products, branches } from "@/data/seed";
 import { useApp } from "@/context/AppContext";
 import { fmtTZS, fmtDate } from "@/lib/format";
-import { Plus, PackageCheck } from "lucide-react";
+import { Plus, PackageCheck, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 
 interface GrnLine { productId: string; qtyOrdered: number; qtyReceived: number; batchNo: string; expiry: string; unitCost: number; }
