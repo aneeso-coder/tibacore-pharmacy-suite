@@ -37,6 +37,7 @@ const groups: Group[] = [
     { to: "/purchase-orders", label: "Purchase Orders", icon: ShoppingBag },
     { to: "/suppliers", label: "Suppliers", icon: Truck },
     { to: "/grn", label: "Goods Received", icon: PackageCheck },
+    { to: "/grn-wizard-preview", label: "GRN Wizard (preview)", icon: Eye },
     { to: "/creditors", label: "Creditors", icon: TrendingDown, perm: "creditors" },
   ]},
   { label: "Reports", perm: "reports", items: [

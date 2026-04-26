@@ -30,6 +30,7 @@ import Creditors from "./pages/Creditors";
 import Invoices from "./pages/Invoices";
 import NotFound from "./pages/NotFound";
 import ReceiptPreview from "./pages/ReceiptPreview";
+import GrnWizardPreview from "./pages/GrnWizardPreview";
 
 const queryClient = new QueryClient();
 
@@ -66,6 +67,7 @@ const App = () => (
               <Route path="/admin/tra" element={<Protected perm="tra_settings"><TraSettings /></Protected>} />
               <Route path="/admin/system" element={<Protected perm="system_settings"><SystemSettings /></Protected>} />
               <Route path="/receipt-preview" element={<Protected><ReceiptPreview /></Protected>} />
+              <Route path="/grn-wizard-preview" element={<Protected perm="purchasing"><GrnWizardPreview /></Protected>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
